@@ -1,4 +1,4 @@
-﻿namespace Solar.Asm.Engine.Model.Bookkeeping
+﻿namespace Solar.Asm.Engine.Model.Meta
 {
     public class ExpressionTable
     {
