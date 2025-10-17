@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <Title>SolarMLA - Orchestrator</Title>
+    <AssemblyName>sasmlib</AssemblyName>
+    <RootNamespace>Solar.Asm.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Model\Engine.Model.csproj" />
+  </ItemGroup>
+
+</Project>
