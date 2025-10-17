@@ -2,7 +2,7 @@
 
 namespace Solar.Asm.Engine.Model.Meta
 {
-    internal class Function
+    internal class Function : ModelEntity
     {
     }
 }
