@@ -4,6 +4,8 @@ namespace Solar.Asm.Engine.Model
 {
     public abstract class Section : ProgramEntity
     {
-
+        protected Section(EntityManager owningTable) : base(owningTable)
+        {
+        }
     }
 }

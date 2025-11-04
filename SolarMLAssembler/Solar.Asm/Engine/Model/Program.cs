@@ -2,8 +2,7 @@
 
 namespace Solar.Asm.Engine.Model
 {
-    public class Program : ModelEntity
+    public class Program
     {
-
     }
 }

@@ -2,5 +2,6 @@
 {
     public abstract class ProgramEntity : ModelEntity
     {
+        protected ProgramEntity(EntityManager owningTable) : base(owningTable) { }
     }
 }
