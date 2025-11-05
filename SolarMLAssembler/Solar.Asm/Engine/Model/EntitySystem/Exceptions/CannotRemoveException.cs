@@ -1,7 +1,6 @@
-﻿
-namespace Solar.Asm.Engine.Model.Exceptions
+﻿namespace Solar.EntitySystem.Exceptions
 {
-    public class CannotRemoveException : SmlaException
+    public class CannotRemoveException : EntitySystemException
     {
         public CannotRemoveException()
         {

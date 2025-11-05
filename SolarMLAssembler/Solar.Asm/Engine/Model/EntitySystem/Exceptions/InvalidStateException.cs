@@ -1,7 +1,6 @@
-﻿
-namespace Solar.Asm.Engine.Model.Exceptions
+﻿namespace Solar.EntitySystem.Exceptions
 {
-    public class InvalidStateException : SmlaException
+    public class InvalidStateException : EntitySystemException
     {
         public InvalidStateException()
         {

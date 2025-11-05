@@ -1,6 +1,6 @@
-﻿namespace Solar.Asm.Engine.Model.Exceptions
+﻿namespace Solar.EntitySystem.Exceptions
 {
-    public class InvalidEntityUsedException : SmlaException
+    public class InvalidEntityUsedException : EntitySystemException
     {
         public InvalidEntityUsedException()
         {

@@ -1,4 +1,6 @@
-﻿namespace Solar.Asm.Engine.Model.Entity
+﻿using Solar.EntitySystem;
+
+namespace Solar.Asm.Engine.Model.Program
 {
     public abstract class ProgramEntity : ModelEntity
     {

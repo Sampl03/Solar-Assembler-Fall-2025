@@ -1,6 +1,6 @@
-﻿using Solar.Asm.Engine.Model.Exceptions;
+﻿using Solar.EntitySystem.Exceptions;
 
-namespace Solar.Asm.Engine.Model.Entity
+namespace Solar.EntitySystem
 {
     /// <summary>
     /// Parent class of EntityHandle to allow non-generic handling of handles.
@@ -86,7 +86,7 @@ namespace Solar.Asm.Engine.Model.Entity
 
         internal override void ReplaceReferent(ModelEntity newReferent)
         {
-            if (!typeof(TEntity).IsInstanceOfType(newReferent))
+            if (newReferent is not TEntity)
                 throw new IncompatibleEntityException(
                     $"Entity of type '{newReferent.GetType().FullName}' is not assignable to handle's maximal entity type '{typeof(TEntity).FullName}'",
                     typeof(TEntity), newReferent.GetType()

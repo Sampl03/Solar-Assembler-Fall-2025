@@ -1,6 +1,6 @@
-﻿namespace Solar.Asm.Engine.Model.Exceptions
+﻿namespace Solar.EntitySystem.Exceptions
 {
-    public class IrreplaceableEntityException : SmlaException
+    public class IrreplaceableEntityException : EntitySystemException
     {
         public IrreplaceableEntityException() { }
 

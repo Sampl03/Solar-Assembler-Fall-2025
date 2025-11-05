@@ -1,7 +1,6 @@
-﻿
-namespace Solar.Asm.Engine.Model.Exceptions
+﻿namespace Solar.EntitySystem.Exceptions
 {
-    public class IncompatibleEntityException : SmlaException
+    public class IncompatibleEntityException : EntitySystemException
     {
         public Type? EntityTypeExpected { get; init; }
         public Type? EntityTypeReceived { get; init; }

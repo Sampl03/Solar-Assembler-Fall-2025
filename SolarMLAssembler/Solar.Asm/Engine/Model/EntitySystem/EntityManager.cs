@@ -1,7 +1,8 @@
-﻿using Solar.Asm.Engine.Model.Exceptions;
-using Solar.Asm.Engine.Model.Utils;
+﻿using Solar.EntitySystem.Behavior;
+using Solar.EntitySystem.Exceptions;
+using Solar.EntitySystem.Utils;
 
-namespace Solar.Asm.Engine.Model.Entity
+namespace Solar.EntitySystem
 {
     /// <summary>
     /// A manager for entities.
@@ -112,6 +113,9 @@ namespace Solar.Asm.Engine.Model.Entity
             _entities.Add(entity);
             _entityHandles[entity] = new();
 
+            // If the entity is IUniqueEntity, check for duplicates
+            // TODO
+
             return true;
         }
 
@@ -187,7 +191,7 @@ namespace Solar.Asm.Engine.Model.Entity
 
         internal bool CanReplaceEntityWith(ModelEntity oldEntity, ModelEntity newEntity)
         {
-            if (!oldEntity.CanBeReplaced)
+            if (oldEntity is IIrreplaceableEntity)
                 return false;
 
             if (oldEntity.OwningTable != newEntity.OwningTable)
@@ -222,7 +226,7 @@ namespace Solar.Asm.Engine.Model.Entity
         internal bool ReplaceEntity(ModelEntity oldEntity, ModelEntity newEntity)
         {
             // First, if the old entity is not replaceable, throw an exception
-            if (!oldEntity.CanBeReplaced)
+            if (oldEntity is IIrreplaceableEntity)
                 throw new IrreplaceableEntityException($"Entity of type '{oldEntity.GetType().FullName}' cannot be replaced.");
 
             // Second, if the newEntity is not managed by this manager, we cannot proceed

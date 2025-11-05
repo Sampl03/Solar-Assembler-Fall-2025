@@ -1,4 +1,4 @@
-﻿using Solar.Asm.Engine.Model.Entity;
+﻿using Solar.EntitySystem;
 
 namespace Solar.Asm.Engine.Model.Meta
 {

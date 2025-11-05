@@ -1,4 +1,4 @@
-﻿namespace Solar.Asm.Engine.Model.Utils
+﻿namespace Solar.EntitySystem.Utils
 {
     internal static class WeakRefListExtensions
     {

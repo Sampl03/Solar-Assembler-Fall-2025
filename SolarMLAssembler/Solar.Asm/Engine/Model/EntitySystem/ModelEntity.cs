@@ -1,7 +1,7 @@
-﻿using Solar.Asm.Engine.Model.Exceptions;
-using Solar.Asm.Engine.Model.Entity.Behavior;
+﻿using Solar.EntitySystem.Behavior;
+using Solar.EntitySystem.Exceptions;
 
-namespace Solar.Asm.Engine.Model.Entity
+namespace Solar.EntitySystem
 {
     /// <summary>
     /// Represents an entity in the model which can be accessed via an opaque handle
@@ -11,8 +11,6 @@ namespace Solar.Asm.Engine.Model.Entity
         public EntityManager OwningTable { get; init; }
 
         public bool IsValid { get; private set; } = true;
-
-        public bool CanBeReplaced => typeof(IIrreplaceableEntity).IsAssignableFrom(this.GetType());
 
         protected ModelEntity(EntityManager owningTable)
         {

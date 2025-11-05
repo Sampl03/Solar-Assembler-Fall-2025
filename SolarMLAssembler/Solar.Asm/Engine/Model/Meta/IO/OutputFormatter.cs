@@ -1,6 +1,6 @@
-﻿using Solar.Asm.Engine.Model.Entity;
+﻿using Solar.EntitySystem;
 
-namespace Solar.Asm.Engine.Model.IO
+namespace Solar.Asm.Engine.Model.Meta.IO
 {
     public abstract class OutputFormatter : ModelEntity
     {

@@ -1,6 +1,6 @@
-﻿using Solar.Asm.Engine.Model.Entity;
+﻿using Solar.EntitySystem;
 
-namespace Solar.Asm.Engine.Model
+namespace Solar.Asm.Engine.Model.Program
 {
     internal class Register : ProgramEntity
     {

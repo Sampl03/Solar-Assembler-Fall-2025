@@ -1,6 +1,4 @@
-﻿using System.Numerics;
-
-namespace Solar.Asm.Engine.Model.Meta
+﻿namespace Solar.Asm.Engine.Model.Meta
 {
     public class QualifiedNameException : Exception;
 
