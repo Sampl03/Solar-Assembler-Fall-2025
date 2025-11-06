@@ -3,19 +3,27 @@ using Solar.EntitySystem.Exceptions;
 
 namespace Solar.EntitySystem
 {
+    public enum EntityState
+    {
+        Uninitialised,
+        Valid,
+        Invalid
+    }
+
     /// <summary>
     /// Represents an entity in the model which can be accessed via an opaque handle
     /// </summary>
     public abstract class ModelEntity
     {
-        public EntityManager OwningTable { get; init; }
+        public EntityManager OwningTable { get; internal set; }
 
-        public bool IsValid { get; private set; } = true;
+        public EntityState State { get; private set; } = EntityState.Uninitialised;
+
+        public bool IsValid => State == EntityState.Valid;
 
         protected ModelEntity(EntityManager owningTable)
         {
             OwningTable = owningTable;
-            owningTable.RegisterEntity(this);
         }
 
         /// <summary>
@@ -42,7 +50,30 @@ namespace Solar.EntitySystem
         {
             if (!IsValid && throwIfInvalid)
                 throw new InvalidEntityUsedException("This entity is invalid and can no longer be used.");
-            return !IsValid;
+            return State != EntityState.Valid;
+        }
+
+        /// <summary>
+        /// Initialises an entity, must be called before an entity is used
+        /// </summary>
+        /// <remarks>
+        /// Throws <see cref="InvalidEntityUsedException"/> if this is a <see cref="IUniqueEntity"/>
+        /// and an equivalent entity already exists.
+        /// </remarks>
+        /// <returns>
+        /// <see langword="true"/> if initialised successfully<br/>
+        /// <see langword="false"/> if not in an uninitialised state
+        /// </returns>
+        /// <exception cref="InvalidEntityUsedException"></exception>
+        public bool Initialise()
+        {
+            if (State != EntityState.Uninitialised)
+                return false;
+
+            State = EntityState.Valid;
+            OwningTable.RegisterEntity(this); // this may invalidate the entity if it's IUniqueEntity
+            GuardValidity(); // in which case this will throw an exception
+            return true;
         }
 
         /// <summary>
@@ -66,7 +97,7 @@ namespace Solar.EntitySystem
             OwningTable.UnregisterEntity(this);
 
             // If code reaches here, the entity was successfully removed and we can mark it invalid
-            IsValid = false;
+            State = EntityState.Invalid;
 
             return true;
         }
