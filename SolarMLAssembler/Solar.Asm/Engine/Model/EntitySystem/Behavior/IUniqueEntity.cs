@@ -1,16 +1,17 @@
 ﻿namespace Solar.EntitySystem.Behavior
 {
     /// <summary>
-    /// Non-generic superclass of IUniqueEntity<br/>
-    /// 
+    /// Represents an entity that should be unique within its manager.<br/>
+    /// The manager will automatically merge equivalent entities together. They must be of the same type
     /// </summary>
-    public interface IUniqueEntityBase : IMergeableBase
+    /// <remarks>
+    /// Merge behaviour defaults to doing nothing, although this be customized.
+    /// </remarks>
+    public interface IUniqueEntity : IMergeable
     {
-
-    }
-
-    public interface IUniqueEntity<T> : IUniqueEntityBase, IMergeable<T> where T : ModelEntity
-    {
-
+        bool IMergeable.CanMerge(IMergeable other) => true;
+        void IMergeable.Merge(IMergeable other) { }
+        int EntityHash();
+        bool EntityEquivalent(IUniqueEntity other);
     }
 }
