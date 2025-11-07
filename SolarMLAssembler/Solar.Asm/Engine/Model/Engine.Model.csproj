@@ -9,4 +9,8 @@
     <RootNamespace>Solar.Asm.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Solar.EntitySystem\Solar.EntitySystem.csproj" />
+  </ItemGroup>
+
 </Project>

@@ -9,7 +9,7 @@ namespace Solar.EntitySystem
     /// 
     /// Tracks entities and provides functionality for querying and obtaining handles to them.
     /// </summary>
-    public sealed class EntityManager
+    public sealed class EntityManager : IMergeable
     {
         /// <summary>The list of entities in this manager</summary>
         private readonly List<ModelEntity> _entities = [];
@@ -67,6 +67,21 @@ namespace Solar.EntitySystem
             return _entities
                 .Where(entity => entity.IsValid)
                 .Where(predicate ?? (e => true));
+        }
+
+        public bool CanMerge(IMergeable other)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Merge(IMergeable other)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void WasMerged()
+        {
+            throw new NotImplementedException();
         }
 
         /// <summary>Returns the number of valid handles</summary>
