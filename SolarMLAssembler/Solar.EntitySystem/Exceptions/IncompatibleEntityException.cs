@@ -17,13 +17,13 @@
         {
         }
 
-        public IncompatibleEntityException(string message, Type expectedType, Type receivedType) : base(message)
+        public IncompatibleEntityException(string message, Type expectedType, Type receivedType) : this(message)
         {
             EntityTypeExpected = expectedType;
             EntityTypeReceived = receivedType;
         }
 
-        public IncompatibleEntityException(string? message, Type expectedType, Type receivedType, Exception inner) : base(message, inner)
+        public IncompatibleEntityException(string? message, Type expectedType, Type receivedType, Exception inner) : this(message, inner)
         {
             EntityTypeExpected = expectedType;
             EntityTypeReceived = receivedType;
