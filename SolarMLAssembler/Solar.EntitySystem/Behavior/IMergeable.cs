@@ -30,11 +30,5 @@ namespace Solar.EntitySystem.Behavior
         /// <param name="other">The other mergeable</param>
         /// <exception cref="CannotMergeException"></exception>
         void Merge(IMergeable other);
-
-        /// <summary>
-        /// Tells a mergeable that it has been merged and needs to clean up.<br/>
-        /// Should be called as necessary in <see cref="Merge(IMergeable)"/>.
-        /// </summary>
-        void WasMerged() { }
     }
 }
