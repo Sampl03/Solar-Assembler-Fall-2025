@@ -12,9 +12,9 @@ namespace Solar.EntitySystem
     public sealed class EntityManager
     {
         /// <summary>The list of entities in this manager</summary>
-        private readonly List<ModelEntity> _entities = new();
+        private readonly List<ModelEntity> _entities = [];
         /// <summary>A map of entities to their assigned handles</summary>
-        private readonly Dictionary<ModelEntity, List<WeakReference<EntityHandleBase>>> _entityHandles = new();
+        private readonly Dictionary<ModelEntity, List<WeakReference<EntityHandleBase>>> _entityHandles = [];
 
         /// <summary>The most generic type of referent this manager can store</summary>
         public readonly Type MaximalEntityType;
@@ -40,15 +40,31 @@ namespace Solar.EntitySystem
         public int GetEntityCount() => _entities.Where(entity => entity.IsValid).Count();
 
         /// <summary>
-        /// Hook to search for entities
+        /// Searches for valid entities of a specific type, with filtering support
         /// </summary>
-        /// <typeparam name="TEntity"></typeparam>
-        /// <param name="predicate"></param>
-        /// <returns></returns>
+        /// <typeparam name="TEntity">The specific type</typeparam>
+        /// <param name="predicate">An optional search filter function to apply</param>
+        /// <returns>
+        /// An enumerable of the matching entities
+        /// </returns>
         public IEnumerable<TEntity> SearchEntities<TEntity>(Func<TEntity, bool>? predicate = null) where TEntity : ModelEntity
         {
             return _entities
                 .OfType<TEntity>()
+                .Where(entity => entity.IsValid)
+                .Where(predicate ?? (e => true));
+        }
+
+        /// <summary>
+        /// Searches for valid entities, with filtering support
+        /// </summary>
+        /// <param name="predicate">An optional search filter function to apply</param>
+        /// <returns>
+        /// An enumerable of the matching entities
+        /// </returns>
+        public IEnumerable<ModelEntity> SearchEntities(Func<ModelEntity, bool>? predicate = null)
+        {
+            return _entities
                 .Where(entity => entity.IsValid)
                 .Where(predicate ?? (e => true));
         }
@@ -92,10 +108,12 @@ namespace Solar.EntitySystem
         /// <remarks>
         /// Should only be called by the referent itself.<br/>
         /// <br/>
-        /// Throws <see cref="IncompatibleEntityException"/> if the referent is not compatible with this manager's maximal type.
+        /// Throws <see cref="IncompatibleEntityException"/> if the referent is not compatible with this manager's maximal type.<br/>
+        /// Throws <see cref="UniquenessConstraintFailedException"/> if the entity is IUniqueEntity and another duplicate already exists (incorrect initialisation)
         /// </remarks>
         /// <param name="entity">The referent to add</param>
         /// <exception cref="IncompatibleEntityException"></exception>
+        /// <exception cref="UniquenessConstraintFailedException"></exception>
         /// <returns><see langword="true"/> if the referent was added, <see langword="false"/> if it was already present</returns>
         internal bool RegisterEntity(ModelEntity entity)
         {
@@ -109,12 +127,33 @@ namespace Solar.EntitySystem
             if (_entityHandles.ContainsKey(entity))
                 return false;
 
+            // If the entity is IUniqueEntity, check for duplicates
+            if (entity is IUniqueEntity)
+            {
+                IUniqueEntity uEntity = (IUniqueEntity)entity;
+                Type entityType = uEntity.GetType();
+                int entityHash = uEntity.EntityHash();
+
+                int numOtherEntities = _entities
+                    .Where(e => e is IUniqueEntity)
+                    .Where( // Find all other entities of the same type
+                        e => !ReferenceEquals(e, uEntity) &&
+                        entityType.Equals(e.GetType()))
+                    .Where( // Which have an equivalent hash
+                        e => ((IUniqueEntity)e).EntityHash() == entityHash)
+                    .Where( // Which are equivalent
+                        e => ((IUniqueEntity)e).EntityEquivalent((ModelEntity)uEntity))
+                    .Count();
+
+                // If there's another entity, this entity's creator initialised without checking for duplicates
+                // We throw an exception
+                if (numOtherEntities > 0)
+                    throw new UniquenessConstraintFailedException("There cannot be more than one equivalent instances of the same IUniqueEntity.");
+            }
+
             // Add the referent and create empty handle list
             _entities.Add(entity);
-            _entityHandles[entity] = new();
-
-            // If the entity is IUniqueEntity, check for duplicates
-            // TODO
+            _entityHandles[entity] = [];
 
             return true;
         }
@@ -191,15 +230,27 @@ namespace Solar.EntitySystem
 
         internal bool CanReplaceEntityWith(ModelEntity oldEntity, ModelEntity newEntity)
         {
-            if (oldEntity is IIrreplaceableEntity)
+            // Both entities must be valid
+            if (!(oldEntity.IsValid && newEntity.IsValid))
                 return false;
 
+            // Old entity must be in this manager
+            if (oldEntity.OwningTable != this)
+                return false;
+
+            // Both entities must be in the same manager
             if (oldEntity.OwningTable != newEntity.OwningTable)
                 return false;
 
-            if (!oldEntity.GetMaximalReplacementType(out Type? maximalType))
+            // Replaced entity must not be IIrreplaceableEntity
+            if (oldEntity is IIrreplaceableEntity)
                 return false;
 
+            // Check should not be needed (oldEntity belongs this manager if we reach here, but failsafe)
+            if (!GetEntityMaximalReplacementType(oldEntity, out Type? maximalType))
+                return false;
+
+            // All handles of the old entity must be reassignable to the new entity
             if (!maximalType!.IsInstanceOfType(newEntity))
                 return false;
 
@@ -213,42 +264,49 @@ namespace Solar.EntitySystem
         /// Both entities must be managed by this manager<br/>
         /// <br/>
         /// Throws <see cref="IrreplaceableEntityException"/> if the entity being replaced is marked as irreplaceable<br/>
-        /// Throws <see cref="IncompatibleEntityException"/> if the new entity is incompatible with at least one of the old entity's handles
+        /// Throws <see cref="IncompatibleEntityException"/> if the new entity is incompatible with at least one of the old entity's handles<br/>
+        /// Throws <see cref="ManagerMismatchException"/> if the old and new entities are not of the same manager
         /// </remarks>
         /// <param name="oldEntity"></param>
         /// <param name="newEntity"></param>
         /// <returns>
         /// <see langword="true"/> if the entity was successfully replaced<br/>
-        /// <see langword="false"/> if either the oldEntity or newEntity weren't managed by this manager
+        /// <see langword="false"/> if the entities were not managed by this manager
         /// </returns>
         /// <exception cref="IrreplaceableEntityException"></exception>
         /// <exception cref="IncompatibleEntityException"></exception>
+        /// <exception cref="ManagerMismatchException"></exception>
         internal bool ReplaceEntity(ModelEntity oldEntity, ModelEntity newEntity)
         {
-            // First, if the old entity is not replaceable, throw an exception
+            // If one of the entities is invalid, throw an exception
+            oldEntity.GuardValidity();
+            newEntity.GuardValidity();
+
+            // If the old and new entities are not both in this manager, throw an exception
+            if (oldEntity.OwningTable != newEntity.OwningTable)
+                throw new ManagerMismatchException("Tried to replace entity with an entity from a different manager.");
+
+            // If old entity is non-repleaceable, throw an exceptino
             if (oldEntity is IIrreplaceableEntity)
                 throw new IrreplaceableEntityException($"Entity of type '{oldEntity.GetType().FullName}' cannot be replaced.");
 
-            // Second, if the newEntity is not managed by this manager, we cannot proceed
-            if (!_entityHandles.ContainsKey(newEntity))
-                return false;
-
-            // Third, we find the most generic type compatible with all of oldEntity's handles
-            //   this will cleanup dead oldEntity handles
+            // Find the most generic type compatible with all of oldEntity's handles
+            //  Return value is false if oldEntity is not managed by this manager (and thus newEntity too)
+            //  This will cleanup dead oldEntity handles
             bool isEntityManaged = GetEntityMaximalReplacementType(oldEntity, out Type? maximalCompatibleType);
 
             // If the function returned false, oldEntity is not in this manager and we cannot proceed
-            if (!isEntityManaged || maximalCompatibleType is null)
+            if (!isEntityManaged || maximalCompatibleType is null) // Doing a null check silences the compiler, though isEntityManaged fulfills this purpose
                 return false;
 
-            // Fourth, if newEntity is not compatible with the maximal compatible type, throw an exception
+            // If newEntity is not compatible with the maximal compatible type, throw an exception
             if (!maximalCompatibleType.IsInstanceOfType(newEntity))
                 throw new IncompatibleEntityException(
                     $"Entity of type '{newEntity.GetType().FullName}' is not assignable to EntityManager's maximal entity type '{maximalCompatibleType.FullName}'",
                     maximalCompatibleType, newEntity.GetType()
                 );
 
-            // Fifth, everything is compatible, transfer the handles
+            // Everything is compatible, transfer the handles
             CleanupHandles(newEntity); // cleanup newEntity handle too
             var oldHandles = _entityHandles[oldEntity]; // cache for faster lookup
             var newHandles = _entityHandles[newEntity];
@@ -259,7 +317,7 @@ namespace Solar.EntitySystem
             newHandles.AddRange(oldHandles);
             oldHandles.Clear();
 
-            // Sixth, invalidate the old entity
+            // Invalidate the old entity
             oldEntity.Invalidate();
 
             return true; // success!

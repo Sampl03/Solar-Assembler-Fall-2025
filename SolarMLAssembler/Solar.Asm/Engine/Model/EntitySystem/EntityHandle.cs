@@ -17,7 +17,7 @@ namespace Solar.EntitySystem
         public abstract bool IsValid { get; }
 
         /// <summary>
-        /// Internal function to change
+        /// Internal function to change the referent of this handle
         /// </summary>
         /// <param name="newReferent"></param>
         internal abstract void ReplaceReferent(ModelEntity newReferent);

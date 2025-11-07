@@ -57,22 +57,21 @@ namespace Solar.EntitySystem
         /// Initialises an entity, must be called before an entity is used
         /// </summary>
         /// <remarks>
-        /// Throws <see cref="InvalidEntityUsedException"/> if this is a <see cref="IUniqueEntity"/>
-        /// and an equivalent entity already exists.
+        /// Throws <see cref="UniquenessConstraintFailedException"/> if the entity is <see cref="IUniqueEntity"/> and another duplicate already exists within the same manager (incorrect initialisation)<br/>
+        ///  -> Use <see cref="UniqueEntity.Make{TUnique}(TUnique)"/> instead.
         /// </remarks>
         /// <returns>
         /// <see langword="true"/> if initialised successfully<br/>
         /// <see langword="false"/> if not in an uninitialised state
         /// </returns>
-        /// <exception cref="InvalidEntityUsedException"></exception>
+        /// <exception cref="UniquenessConstraintFailedException"></exception>
         public bool Initialise()
         {
             if (State != EntityState.Uninitialised)
                 return false;
 
             State = EntityState.Valid;
-            OwningTable.RegisterEntity(this); // this may invalidate the entity if it's IUniqueEntity
-            GuardValidity(); // in which case this will throw an exception
+            OwningTable.RegisterEntity(this);
             return true;
         }
 
