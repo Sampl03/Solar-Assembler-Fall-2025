@@ -100,7 +100,7 @@ namespace Solar.EntitySystem
                     e => ((IUniqueEntity)e).EntityEquivalent((ModelEntity)template))
                 .Cast<IUniqueEntity>();
 
-            if (otherEntities.Count() > 0)
+            if (otherEntities.Count() > 1)
                 throw new UniquenessConstraintFailedException("There cannot be more than one equivalent instances of the same IUniqueEntity.");
 
             return otherEntities.FirstOrDefault();
