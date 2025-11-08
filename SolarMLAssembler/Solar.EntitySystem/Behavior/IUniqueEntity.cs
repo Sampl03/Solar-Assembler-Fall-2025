@@ -98,17 +98,12 @@ namespace Solar.EntitySystem.Behavior
             var templateHash = template.EntityHash();
 
             // Search for equivalent entities
-            var otherEntity = template
-                .OwningTable
-                .SearchEntities<TUnique>(e => e.EntityHash() == templateHash)
-                .Where(template.EntityEquivalent)
-                .ToArray();
+            var otherEntity = template.OwningTable.FindEquivalentEntity(template);
 
-            // There should be 0 or 1 because of EntityManager's registration rules. We do not check this
+            // If there is one, we return it
+            if (otherEntity is not null)
+                return (TUnique)otherEntity;
 
-            // If there is already an entity, we return it.
-            if (otherEntity.Count() != 0)
-                return otherEntity[0];
 
             // Otherwise initialise the template and return it
             template.Initialise();

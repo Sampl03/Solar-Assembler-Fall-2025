@@ -69,19 +69,115 @@ namespace Solar.EntitySystem
                 .Where(predicate ?? (e => true));
         }
 
+        /// <summary>
+        /// Find the unique entity equivalent to <paramref name="template"/> in this entity manager.<br/>
+        /// This may return the template itself if it has been initialised within the manager
+        /// </summary>
+        /// <remarks>
+        /// Throws <see cref="UniquenessConstraintFailedException"/> if the entity is IUniqueEntity and another duplicate already exists (incorrect initialisation)
+        /// </remarks>
+        /// <param name="template">The template instance to use for equivalence checking</param>
+        /// <returns>
+        /// The sole equivalent entity, or <see langword="null"/> if there is none
+        /// </returns>
+        /// <exception cref="UniquenessConstraintFailedException"></exception>
+        public IUniqueEntity? FindEquivalentEntity(IUniqueEntity template)
+        {
+            Type entityType = template.GetType();
+            int entityHash = template.EntityHash();
+
+            var otherEntities = _entities
+                .Where(e => e is IUniqueEntity)
+                .Where( // Find all other entities of the same type
+                    e => entityType.Equals(e.GetType()))
+                .Where( // Which have an equivalent hash
+                    e => ((IUniqueEntity)e).EntityHash() == entityHash)
+                .Where( // Which are equivalent
+                    e => ((IUniqueEntity)e).EntityEquivalent((ModelEntity)template))
+                .Cast<IUniqueEntity>();
+
+            if (otherEntities.Count() > 0)
+                throw new UniquenessConstraintFailedException("There cannot be more than one equivalent instances of the same IUniqueEntity.");
+
+            return otherEntities.FirstOrDefault();
+        }
+
+        /// <param name="other">The other manager to merge with</param>
+        /// <returns>
+        /// <see langword="true"/> if <paramref name="other"/> is a compatible <see cref="EntityManager"/>. They must have the same maximal type and not be the same manager<br/>
+        /// <see langword="false"/> otherwise.
+        /// </returns>
         public bool CanMerge(IMergeable other)
         {
-            throw new NotImplementedException();
+            if (other is not EntityManager)
+                return false;
+
+            if (MaximalEntityType != ((EntityManager)other).MaximalEntityType)
+                return false;
+
+            return !ReferenceEquals(this, other);
         }
 
+        /// <summary>
+        /// Transfers all the objects of the <paramref name="other"/> manager to this manager, provided that they are compatible.<br/>
+        /// Unique entities with equivalent instances in both managers will be merged together
+        /// </summary>
+        /// <remarks>
+        /// Throws <see cref="CannotMergeException"/> if <paramref name="other"/> is not a compatible manager<br/>
+        /// See <seealso cref="CanMerge(IMergeable)"/>
+        /// </remarks>
+        /// <param name="other"></param>
+        /// <exception cref="CannotMergeException"></exception>
         public void Merge(IMergeable other)
         {
-            throw new NotImplementedException();
-        }
+            if (!CanMerge(other))
+                throw new CannotMergeException("EntityManager instance could not merge with another instance", this, other);
 
-        public void WasMerged()
-        {
-            throw new NotImplementedException();
+            var otherManager = (EntityManager)other;
+
+            // Iterate over the entities of the other manager, transferring their handles
+            CleanupAllHandles();
+            otherManager.CleanupAllHandles();
+
+            for (int i = otherManager._entities.Count - 1; i >= 0; i--)
+            {
+                ModelEntity entityToTransfer = otherManager._entities[i];
+                var entityHandlesToTransfer = otherManager._entityHandles[entityToTransfer];
+
+                // For unique entities, verify if there's another equivalent, and merge as needed
+                if (entityToTransfer is IUniqueEntity)
+                {
+                    // Find the equivalent entity if it exists
+                    var existingEntity = FindEquivalentEntity((IUniqueEntity)entityToTransfer);
+
+                    // Merge into it if it exists
+                    if (existingEntity is not null)
+                    {
+                        existingEntity.Merge((IMergeable)entityToTransfer);
+
+                        // Transfer handles
+                        _entityHandles[(ModelEntity)existingEntity].AddRange(entityHandlesToTransfer);
+                        foreach (var handle in entityHandlesToTransfer.GetLiveTargets())
+                            handle.ReplaceReferent((ModelEntity)existingEntity);
+                        entityHandlesToTransfer.Clear();
+
+                        // Remove from the old manager
+                        otherManager._entities.RemoveAt(i);
+                        otherManager._entityHandles.Remove(entityToTransfer);
+
+                        continue; // We don't need to move the old entity in this case
+                    }
+                }
+
+                // Move the entity to the current manager
+                _entities.Add(entityToTransfer);
+                _entityHandles[entityToTransfer] = [.. entityHandlesToTransfer];
+
+                // Remove from the old manager
+                otherManager._entities.RemoveAt(i);
+                otherManager._entityHandles.Remove(entityToTransfer);
+
+            }
         }
 
         /// <summary>Returns the number of valid handles</summary>
@@ -145,25 +241,8 @@ namespace Solar.EntitySystem
             // If the entity is IUniqueEntity, check for duplicates
             if (entity is IUniqueEntity)
             {
-                IUniqueEntity uEntity = (IUniqueEntity)entity;
-                Type entityType = uEntity.GetType();
-                int entityHash = uEntity.EntityHash();
-
-                int numOtherEntities = _entities
-                    .Where(e => e is IUniqueEntity)
-                    .Where( // Find all other entities of the same type
-                        e => !ReferenceEquals(e, uEntity) &&
-                        entityType.Equals(e.GetType()))
-                    .Where( // Which have an equivalent hash
-                        e => ((IUniqueEntity)e).EntityHash() == entityHash)
-                    .Where( // Which are equivalent
-                        e => ((IUniqueEntity)e).EntityEquivalent((ModelEntity)uEntity))
-                    .Count();
-
-                // If there's another entity, this entity's creator initialised without checking for duplicates
-                // We throw an exception
-                if (numOtherEntities > 0)
-                    throw new UniquenessConstraintFailedException("There cannot be more than one equivalent instances of the same IUniqueEntity.");
+                // This function throws if a duplicate exists
+                FindEquivalentEntity((IUniqueEntity)entity);
             }
 
             // Add the referent and create empty handle list
