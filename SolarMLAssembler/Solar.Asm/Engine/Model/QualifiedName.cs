@@ -1,4 +1,4 @@
-﻿namespace Solar.Asm.Engine.Model.Meta
+﻿namespace Solar.Asm.Engine.Model
 {
     public class QualifiedNameException : Exception;
 
@@ -41,11 +41,11 @@
             if (ReferenceEquals(this, other))
                 return true;
 
-            if (this.Depth != other.Depth)
+            if (Depth != other.Depth)
                 return false;
 
-            for (int i = 0; i < this.Depth; i++)
-                if (this._names[i] != other._names[i])
+            for (int i = 0; i < Depth; i++)
+                if (_names[i] != other._names[i])
                     return false;
 
             return true;
@@ -79,14 +79,14 @@
         // Returns the closest shared namespace between this and other
         public QualifiedName GetClosestSharedNamespace(QualifiedName other)
         {
-            int shortestDepth = Math.Min(this.Depth, other.Depth);
+            int shortestDepth = Math.Min(Depth, other.Depth);
 
             List<string> sharedNames = new List<string>();
             for (int i = 0; i < shortestDepth; i++)
             {
-                if (this._names[i] == other._names[i])
+                if (_names[i] == other._names[i])
                 {
-                    sharedNames.Add(this._names[i]);
+                    sharedNames.Add(_names[i]);
                 }
                 else
                 {
@@ -98,11 +98,11 @@
         }
 
         // Relationship methods
-        public bool IsAncestorOf(QualifiedName other) => (this != other) && (this.GetClosestSharedNamespace(other) == this);
+        public bool IsAncestorOf(QualifiedName other) => this != other && GetClosestSharedNamespace(other) == this;
         public bool IsDescendantOf(QualifiedName other) => other.IsAncestorOf(this);
         public bool IsParentOf(QualifiedName other) => other.Namespace == this;
-        public bool IsChildOf(QualifiedName other) => this.Namespace == this;
-        public bool IsSiblingOf(QualifiedName other) => (this != other) && (this.Namespace == other.Namespace);
+        public bool IsChildOf(QualifiedName other) => Namespace == this;
+        public bool IsSiblingOf(QualifiedName other) => this != other && Namespace == other.Namespace;
 
         /* Shorthand for methods
          * 
@@ -126,7 +126,7 @@
         // Overrides
         public override string ToString() => string.Join(NamespaceSeparator, _names);
 
-        public override int GetHashCode() => this.ToString().GetHashCode();
+        public override int GetHashCode() => ToString().GetHashCode();
         #endregion
     }
 }

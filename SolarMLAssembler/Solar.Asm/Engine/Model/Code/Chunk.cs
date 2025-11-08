@@ -1,8 +1,8 @@
 ﻿using Solar.EntitySystem;
 
-namespace Solar.Asm.Engine.Model.Program
+namespace Solar.Asm.Engine.Model.Code
 {
-    public abstract class Chunk : ProgramEntity
+    public abstract class Chunk : CodeEntity
     {
         protected Chunk(EntityManager owningTable) : base(owningTable) { }
     }

@@ -1,6 +1,6 @@
 ﻿using Solar.EntitySystem;
 
-namespace Solar.Asm.Engine.Model.Meta
+namespace Solar.Asm.Engine.Model.Symbols
 {
     public abstract class Symbol : ModelEntity
     {
