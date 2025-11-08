@@ -16,6 +16,9 @@ namespace Solar.EntitySystem
         /// <summary>A map of entities to their assigned handles</summary>
         private readonly Dictionary<ModelEntity, List<WeakReference<EntityHandleBase>>> _entityHandles = [];
 
+        /// <summary>The context an EntityManager exists within</summary>
+        public IContext Context { get; init; }
+
         /// <summary>The most generic type of referent this manager can store</summary>
         public readonly Type MaximalEntityType;
 
@@ -27,11 +30,12 @@ namespace Solar.EntitySystem
         /// </remarks>
         /// <param name="maximalEntityType">The most generic referent type </param>
         /// <exception cref="ArgumentException"></exception>
-        public EntityManager(Type maximalEntityType)
+        public EntityManager(IContext context, Type maximalEntityType)
         {
             if (!typeof(ModelEntity).IsAssignableFrom(maximalEntityType))
                 throw new ArgumentException("maximalEntityType must be a type derived from ModelEntity", nameof(maximalEntityType));
 
+            Context = context;
             MaximalEntityType = maximalEntityType;
         }
 
