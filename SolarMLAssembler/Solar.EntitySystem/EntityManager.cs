@@ -189,24 +189,24 @@ namespace Solar.EntitySystem
         /// <returns></returns>
         internal int GetHandleCount(ModelEntity entity)
         {
-            if (!_entityHandles.ContainsKey(entity))
+            if (!_entityHandles.TryGetValue(entity, out List<WeakReference<EntityHandleBase>>? handles))
                 return -1;
 
             CleanupHandles(entity);
-            return _entityHandles[entity].Count;
+            return handles.Count;
         }
 
         /// <summary>Cleanup an entity's handle, removing references to disposed or invalidated handles</summary>
         /// <param name="entity">The entity to clean up the handles of</param>
         internal void CleanupHandles(ModelEntity entity)
         {
-            if (!_entityHandles.ContainsKey(entity))
+            if (!_entityHandles.TryGetValue(entity, out List<WeakReference<EntityHandleBase>>? handles))
                 return;
 
             // Remove invalid or disposed handles
-            for (int i = _entityHandles[entity].Count - 1; i >= 0; i--)
-                if (!_entityHandles[entity][i].TryGetTarget(out EntityHandleBase? handle) || !handle.IsValid)
-                    _entityHandles[entity].RemoveAt(i);
+            for (int i = handles.Count - 1; i >= 0; i--)
+                if (!handles[i].TryGetTarget(out EntityHandleBase? handle) || !handle.IsValid)
+                    handles.RemoveAt(i);
         }
 
         /// <summary>Cleanup all entities' handles, removing references to disposed or invalidated handles</summary>
@@ -273,12 +273,12 @@ namespace Solar.EntitySystem
         internal bool UnregisterEntity(ModelEntity entity)
         {
             // If we don't know this entity, return false early
-            if (!_entityHandles.ContainsKey(entity))
+            if (!_entityHandles.TryGetValue(entity, out List<WeakReference<EntityHandleBase>>? handles))
                 return false;
 
             // Check if there are remaining open handles in this entity
             CleanupHandles(entity); // Cleanup dead handles first
-            if (_entityHandles[entity].Count > 0)
+            if (handles.Count > 0)
                 throw new CannotRemoveException("Cannot invalidate referent because there are still open handles to it.");
 
             // We can now safely remove the entity
@@ -303,15 +303,14 @@ namespace Solar.EntitySystem
         internal bool GetEntityMaximalReplacementType(ModelEntity entity, out Type? maximalType)
         {
             // If we don't know this entity, we can't check its handles
-            if (!_entityHandles.ContainsKey(entity))
+            if (!_entityHandles.TryGetValue(entity, out List<WeakReference<EntityHandleBase>>? handleList))
             {
                 maximalType = null;
                 return false;
             }
 
-            // Cleanup dead references first then cache the references
+            // Cleanup dead references first
             CleanupHandles(entity);
-            var handleList = _entityHandles[entity];
 
             // Then, iterate over all handles
             maximalType = typeof(ModelEntity); // Must be at most a ModelEntity
@@ -389,7 +388,7 @@ namespace Solar.EntitySystem
                 throw new IrreplaceableEntityException($"Entity of type '{oldEntity.GetType().FullName}' cannot be replaced.");
 
             // Find the most generic type compatible with all of oldEntity's handles
-            //  Return value is false if oldEntity is not managed by this manager (and thus newEntity too)
+            //  Return handles is false if oldEntity is not managed by this manager (and thus newEntity too)
             //  This will cleanup dead oldEntity handles
             bool isEntityManaged = GetEntityMaximalReplacementType(oldEntity, out Type? maximalCompatibleType);
 
@@ -472,12 +471,11 @@ namespace Solar.EntitySystem
                 return false;
 
             // If we don't know the referent this handle is associated with, return false early
-            if (!_entityHandles.ContainsKey(referent))
+            if (!_entityHandles.TryGetValue(referent, out List<WeakReference<EntityHandleBase>>? handlesList))
                 return false;
 
-            // Cleanup dead handles first then cache for faster lookup
+            // Cleanup dead handles first
             CleanupHandles(referent);
-            var handlesList = _entityHandles[referent];
 
             // Now we look for the handle in the list and remove it if found
             for (int i = handlesList.Count - 1; i >= 0; i--)
