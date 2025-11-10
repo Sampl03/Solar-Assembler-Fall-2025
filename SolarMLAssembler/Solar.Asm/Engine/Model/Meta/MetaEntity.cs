@@ -2,5 +2,5 @@
 
 namespace Solar.Asm.Engine.Model.Meta
 {
-    public abstract class MetaEntity(EntityManager owningTable) : ModelEntity(owningTable) { }
+    public abstract class MetaEntity : ModelEntity { }
 }

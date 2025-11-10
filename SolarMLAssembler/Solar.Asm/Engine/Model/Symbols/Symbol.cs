@@ -4,7 +4,7 @@ namespace Solar.Asm.Engine.Model.Symbols
 {
     public class Symbol : ModelEntity
     {
-        public Symbol(EntityManager owningTable) : base(owningTable)
+        public Symbol() : base()
         {
         }
     }

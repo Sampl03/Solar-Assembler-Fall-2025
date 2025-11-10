@@ -2,9 +2,9 @@
 
 namespace Solar.Asm.Engine.Model.Meta
 {
-    public class AssemblyParser : ModelEntity
+    public class AssemblyParser : MetaEntity
     {
-        public AssemblyParser(EntityManager owningTable) : base(owningTable)
+        public AssemblyParser() : base()
         {
         }
     }

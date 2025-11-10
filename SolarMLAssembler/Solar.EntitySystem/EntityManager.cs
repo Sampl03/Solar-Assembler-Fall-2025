@@ -254,6 +254,7 @@ namespace Solar.EntitySystem
             // Add the referent and create empty handle list
             _entities.Add(entity);
             _entityHandles[entity] = [];
+            entity.OwningTable = this;
 
             return true;
         }
@@ -286,6 +287,7 @@ namespace Solar.EntitySystem
             // We can now safely remove the entity
             _entityHandles.Remove(entity);
             _entities.Remove(entity);
+            entity.OwningTable = null;
 
             return true;
         }
@@ -521,7 +523,7 @@ namespace Solar.EntitySystem
 
             // If the entity's OwningTable wasn't aware of the entity, there was an error during the entity's creation
             // That should never be the case, so we throw an exception
-            if (!entity.OwningTable.TryCreateHandle(entity, out EntityHandle<THandle>? handle))
+            if (!entity.OwningTable!.TryCreateHandle(entity, out EntityHandle<THandle>? handle))
                 throw new InvalidStateException("Invalid state: the provided entity referenced a manager but was not tracked by the manager. Aborting.");
 
             return handle!;
@@ -533,7 +535,7 @@ namespace Solar.EntitySystem
         public static int GetHandleCount(this ModelEntity entity)
         {
             entity.GuardValidity();
-            return entity.OwningTable.GetHandleCount(entity);
+            return entity.OwningTable!.GetHandleCount(entity);
         }
 
         /// <summary>
@@ -551,7 +553,7 @@ namespace Solar.EntitySystem
         public static bool GetMaximalReplacementType(this ModelEntity entity, out Type? maximalType)
         {
             entity.GuardValidity();
-            return entity.OwningTable.GetEntityMaximalReplacementType(entity, out maximalType);
+            return entity.OwningTable!.GetEntityMaximalReplacementType(entity, out maximalType);
         }
 
         /// <summary>
@@ -571,7 +573,7 @@ namespace Solar.EntitySystem
         {
             oldEntity.GuardValidity();
             newEntity.GuardValidity();
-            return oldEntity.OwningTable.CanReplaceEntityWith(oldEntity, newEntity);
+            return oldEntity.OwningTable!.CanReplaceEntityWith(oldEntity, newEntity);
         }
 
         /// <summary>
@@ -596,7 +598,7 @@ namespace Solar.EntitySystem
         {
             oldEntity.GuardValidity();
             newEntity.GuardValidity();
-            return oldEntity.OwningTable.ReplaceEntity(oldEntity, newEntity);
+            return oldEntity.OwningTable!.ReplaceEntity(oldEntity, newEntity);
         }
     }
 }

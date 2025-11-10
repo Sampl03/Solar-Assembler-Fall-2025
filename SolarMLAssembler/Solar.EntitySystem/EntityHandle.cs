@@ -60,7 +60,7 @@ namespace Solar.EntitySystem
             // Call the manager to remove this handle from the referent's incoming handle list
             // - If an InvalidStateException is thrown, something went wrong so we don't catch it
             // - If the function returns false, then the referent's OwningTable wasn't aware of it. This is an invalid state and we throw.
-            if (!Ref.OwningTable.RemoveEntityHandle(this))
+            if (!Ref.OwningTable!.RemoveEntityHandle(this))
                 throw new InvalidStateException("Invalid state: the handle's referent entity referenced a manager but was not tracked by the manager. Aborting.");
 
             // The handle has now been removed, so we set the reference to null.

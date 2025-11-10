@@ -88,7 +88,7 @@ namespace Solar.EntitySystem.Behavior
         /// <returns>
         /// A valid entity, whether it be reused or a new one
         /// </returns>
-        public static TUnique Make<TUnique>(TUnique template) where TUnique : ModelEntity, IUniqueEntity
+        public static TUnique Make<TUnique>(EntityManager owningTable, TUnique template) where TUnique : ModelEntity, IUniqueEntity
         {
             // Insure uninitialised state
             if (template.State != EntityState.Uninitialised)
@@ -98,7 +98,7 @@ namespace Solar.EntitySystem.Behavior
             var templateHash = template.EntityHash();
 
             // Search for equivalent entities
-            var otherEntity = template.OwningTable.FindEquivalentEntity(template);
+            var otherEntity = owningTable.FindEquivalentEntity(template);
 
             // If there is one, we return it
             if (otherEntity is not null)
@@ -106,7 +106,7 @@ namespace Solar.EntitySystem.Behavior
 
 
             // Otherwise initialise the template and return it
-            template.Initialise();
+            template.Initialise(owningTable);
             return template;
             
         }

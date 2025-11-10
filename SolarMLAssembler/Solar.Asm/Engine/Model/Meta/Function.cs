@@ -2,9 +2,9 @@
 
 namespace Solar.Asm.Engine.Model.Meta
 {
-    internal class Function : ModelEntity
+    public class Function : MetaEntity
     {
-        public Function(EntityManager owningTable) : base(owningTable)
+        public Function() : base()
         {
         }
     }

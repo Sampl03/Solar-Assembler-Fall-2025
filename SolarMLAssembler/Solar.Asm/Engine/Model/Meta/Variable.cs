@@ -2,9 +2,9 @@
 
 namespace Solar.Asm.Engine.Model.Meta
 {
-    internal class Variable : ModelEntity
+    public class Variable : MetaEntity
     {
-        public Variable(EntityManager owningTable) : base(owningTable)
+        public Variable() : base()
         {
         }
     }

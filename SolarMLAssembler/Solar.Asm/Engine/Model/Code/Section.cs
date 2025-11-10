@@ -7,8 +7,8 @@ namespace Solar.Asm.Engine.Model.Code
     {
         public IList<EntityHandle<Fragment>> Fragments { get; } = [];
 
-        public Section(EntityManager owningTable) : base(owningTable)
-        {
+        public Section() : base()
+        { 
         }
 
         public virtual bool EntityEquivalent(ModelEntity other)

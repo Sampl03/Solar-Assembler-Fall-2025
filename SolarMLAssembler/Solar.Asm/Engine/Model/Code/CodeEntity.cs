@@ -2,5 +2,5 @@
 
 namespace Solar.Asm.Engine.Model.Code
 {
-    public abstract class CodeEntity(EntityManager owningTable) : ModelEntity(owningTable) { }
+    public abstract class CodeEntity : ModelEntity { }
 }

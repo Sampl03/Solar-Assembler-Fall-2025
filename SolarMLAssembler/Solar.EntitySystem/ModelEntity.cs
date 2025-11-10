@@ -15,16 +15,13 @@ namespace Solar.EntitySystem
     /// </summary>
     public abstract class ModelEntity
     {
-        public EntityManager OwningTable { get; internal set; }
+        public EntityManager? OwningTable { get; internal set; } = null;
 
         public EntityState State { get; private set; } = EntityState.Uninitialised;
 
         public bool IsValid => State == EntityState.Valid;
 
-        protected ModelEntity(EntityManager owningTable)
-        {
-            OwningTable = owningTable;
-        }
+        protected ModelEntity() { }
 
         /// <summary>
         /// Throws an exception or returns a boolean if the entity is invalid.<br/>
@@ -54,24 +51,25 @@ namespace Solar.EntitySystem
         }
 
         /// <summary>
-        /// Initialises an entity, must be called before an entity is used
+        /// Initialises an entity and registers it with a manager, must be called before an entity is used
         /// </summary>
         /// <remarks>
         /// Throws <see cref="UniquenessConstraintFailedException"/> if the entity is <see cref="IUniqueEntity"/> and another duplicate already exists within the same manager (incorrect initialisation)<br/>
         ///  -> Use <see cref="UniqueEntity.Make{TUnique}(TUnique)"/> instead.
         /// </remarks>
+        /// <param name="owningTable">The manager to register this entity with</param>
         /// <returns>
         /// <see langword="true"/> if initialised successfully<br/>
         /// <see langword="false"/> if not in an uninitialised state
         /// </returns>
         /// <exception cref="UniquenessConstraintFailedException"></exception>
-        public bool Initialise()
+        public bool Initialise(EntityManager owningTable)
         {
             if (State != EntityState.Uninitialised)
                 return false;
 
             State = EntityState.Valid;
-            OwningTable.RegisterEntity(this);
+            owningTable.RegisterEntity(this);
             return true;
         }
 
@@ -93,7 +91,7 @@ namespace Solar.EntitySystem
                 return false;
 
             // Notify the owning table. It is in charge of verifying that there are no more active handles
-            OwningTable.UnregisterEntity(this);
+            OwningTable!.UnregisterEntity(this);
 
             // If code reaches here, the entity was successfully removed and we can mark it invalid
             State = EntityState.Invalid;

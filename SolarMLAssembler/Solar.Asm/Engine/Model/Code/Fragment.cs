@@ -6,7 +6,7 @@ namespace Solar.Asm.Engine.Model.Code
     {
         public IList<EntityHandle<Chunk>> Chunks { get; } = [];
 
-        public Fragment(EntityManager owningTable) : base(owningTable)
+        public Fragment() : base()
         {
         }
     }
