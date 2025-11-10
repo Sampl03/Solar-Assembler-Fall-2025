@@ -169,13 +169,15 @@ namespace Solar.EntitySystem
                         otherManager._entities.RemoveAt(i);
                         otherManager._entityHandles.Remove(entityToTransfer);
 
-                        continue; // We don't need to move the old entity in this case
+                        entityToTransfer.Invalidate(); // We don't need to move the old entity in this case
+                        continue;
                     }
                 }
 
                 // Move the entity to the current manager
                 _entities.Add(entityToTransfer);
                 _entityHandles[entityToTransfer] = [.. entityHandlesToTransfer];
+                entityToTransfer.OwningTable = this;
 
                 // Remove from the old manager
                 otherManager._entities.RemoveAt(i);
