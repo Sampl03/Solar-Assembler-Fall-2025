@@ -2,9 +2,9 @@
 
 namespace Solar.Asm.Engine.Model.Symbols
 {
-    public abstract class Symbol : ModelEntity
+    public class Symbol : ModelEntity
     {
-        protected Symbol(EntityManager owningTable) : base(owningTable)
+        public Symbol(EntityManager owningTable) : base(owningTable)
         {
         }
     }
