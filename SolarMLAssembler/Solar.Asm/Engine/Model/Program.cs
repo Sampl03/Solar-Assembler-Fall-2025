@@ -9,19 +9,23 @@ using Solar.Asm.Engine.Model.Expressions;
 
 namespace Solar.Asm.Engine.Model
 {
+    /// <summary>
+    /// Top-level Context for Solar ML Assembler programs.<br/>
+    /// Contains the <see cref="EntityManager"/> instances to which all Model entities belong.
+    /// </summary>
     public class Program : IContext, IMergeable
     {
-        public EntityManager ProgramEntities { get; init; }
+        public EntityManager CodeEntities { get; init; }
         public EntityManager Meta { get; init; }
         public EntityManager Symbols { get; init; }
         public EntityManager Expressions { get; init; }
 
         public Program()
         {
-            ProgramEntities = new(this, typeof(CodeEntity) );
-            Meta            = new(this, typeof(MetaEntity) );
-            Symbols         = new(this, typeof(Symbol)     );
-            Expressions     = new(this, typeof(Expression) );
+            CodeEntities    = new(this, typeof(CodeEntity)   );
+            Meta            = new(this, typeof(MetaEntity)   );
+            Symbols         = new(this, typeof(Symbol)       );
+            Expressions     = new(this, typeof(Expression<>) );
         }
 
         public bool CanMerge(IMergeable other)
@@ -34,7 +38,7 @@ namespace Solar.Asm.Engine.Model
             Program otherProgram = (Program)other;
 
             // Managers must be able to merge
-            if (!ProgramEntities.CanMerge(otherProgram.ProgramEntities))
+            if (!CodeEntities.CanMerge(otherProgram.CodeEntities))
                 return false;
             if (!Meta.CanMerge(otherProgram.Meta))
                 return false;
@@ -55,7 +59,7 @@ namespace Solar.Asm.Engine.Model
             Program otherProgram = (Program)other;
 
             // Merge
-            ProgramEntities.Merge(otherProgram.ProgramEntities);
+            CodeEntities.Merge(otherProgram.CodeEntities);
             Meta.Merge(otherProgram.Meta);
             Symbols.Merge(otherProgram.Symbols);
             Expressions.Merge(otherProgram.Expressions);
