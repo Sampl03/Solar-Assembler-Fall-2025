@@ -1,11 +1,24 @@
 ﻿using Solar.EntitySystem;
+using Solar.EntitySystem.Behavior;
 
 namespace Solar.Asm.Engine.Model.Code
 {
-    public abstract class Section : CodeEntity
+    public class Section : CodeEntity, IUniqueEntity
     {
-        protected Section(EntityManager owningTable) : base(owningTable)
+        public IList<EntityHandle<Fragment>> Fragments { get; } = [];
+
+        public Section(EntityManager owningTable) : base(owningTable)
         {
+        }
+
+        public virtual bool EntityEquivalent(ModelEntity other)
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual int EntityHash()
+        {
+            throw new NotImplementedException();
         }
     }
 }

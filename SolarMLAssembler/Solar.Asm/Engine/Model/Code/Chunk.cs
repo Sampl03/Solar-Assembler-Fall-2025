@@ -4,6 +4,14 @@ namespace Solar.Asm.Engine.Model.Code
 {
     public abstract class Chunk : CodeEntity
     {
-        protected Chunk(EntityManager owningTable) : base(owningTable) { }
+        protected Chunk(EntityManager owningTable) : base(owningTable)
+        {
+        }
+
+        public abstract byte[] ToBytes();
+
+        public abstract int SizeBytes();
+
+        public abstract bool Shrink();
     }
 }
