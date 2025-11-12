@@ -32,6 +32,10 @@ namespace Solar.EntitySystem
         /// It is the responsibility of the derived or extension class to call this method at the start of all public methods to handle this scenario appropriately.
         /// </summary>
         /// 
+        /// <remarks>
+        /// This will also call <seealso cref="OnValidityGuard(bool)"/>, which can be overridden to add custom checks
+        /// </remarks>
+        /// 
         /// <param name="throwIfInvalid">
         /// If <see langword="true"/> and the entity is invalid, an <see cref="InvalidEntityUsedException"/> will be thrown.<br/>
         /// Otherwise, the method will return whether or not the entity is invalid.
@@ -45,10 +49,37 @@ namespace Solar.EntitySystem
         /// <exception cref="InvalidEntityUsedException">Thrown if the entity is invalid and <paramref name="throwIfInvalid"/> is <see langword="true"/>.</exception>
         public bool GuardValidity(bool throwIfInvalid = true)
         {
-            if (!IsValid && throwIfInvalid)
-                throw new InvalidEntityUsedException("This entity is invalid and can no longer be used.");
-            return State != EntityState.Valid;
+            bool isInValidState;
+            Exception? caughtError = null;
+            try
+            {
+                isInValidState = IsValid && OnValidityGuard();
+            }
+            catch (Exception ex)
+            {
+                isInValidState = false;
+                caughtError = ex;
+            }
+
+            if (!isInValidState)
+            {
+                if (caughtError is not null)
+                    throw new InvalidEntityUsedException("This entity threw an exception during state validation", caughtError);
+                else
+                    throw new InvalidEntityUsedException("This entity is invalid and can no longer be used.");
+            }
+            
+            return true;
         }
+
+        /// <summary>
+        /// Hook method called by <seealso cref="GuardValidity(bool)"/>.<br/>
+        /// Can be overriden by derived classes to add validation behaviour.
+        /// </summary>
+        /// <returns>
+        /// If <paramref name="throwIfInvalid"/> is <see langword="false"/>, this method returns whether or not the entity is in a usable state<br/>
+        /// </returns>
+        protected virtual bool OnValidityGuard() => true;
 
         /// <summary>
         /// Initialises an entity and registers it with a manager, must be called before an entity is used
@@ -63,7 +94,7 @@ namespace Solar.EntitySystem
         /// <see langword="false"/> if not in an uninitialised state
         /// </returns>
         /// <exception cref="UniquenessConstraintFailedException"></exception>
-        public bool Initialise(EntityManager owningTable)
+        public virtual bool Initialise(EntityManager owningTable)
         {
             if (State != EntityState.Uninitialised)
                 return false;
