@@ -4,8 +4,8 @@ namespace Solar.EntitySystem.Exceptions
 {
     public class CannotMergeException : EntitySystemException
     {
+        IMergeable? MergeOrigin;
         IMergeable? MergeDestination;
-        IMergeable? MergeOther;
 
         public CannotMergeException()
         {
@@ -19,16 +19,16 @@ namespace Solar.EntitySystem.Exceptions
         {
         }
 
-        public CannotMergeException(string message, IMergeable destination, IMergeable other) : this(message)
+        public CannotMergeException(string message, IMergeable origin, IMergeable destination) : this(message)
         {
+            MergeOrigin = origin;
             MergeDestination = destination;
-            MergeOther = other;
         }
 
-        public CannotMergeException(string? message, Exception inner, IMergeable destination, IMergeable other) : this(message, inner)
+        public CannotMergeException(string? message, Exception inner, IMergeable origin, IMergeable destination) : this(message, inner)
         {
+            MergeOrigin = origin;
             MergeDestination = destination;
-            MergeOther = other;
         }
     }
 }

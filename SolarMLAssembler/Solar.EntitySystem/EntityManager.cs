@@ -92,7 +92,7 @@ namespace Solar.EntitySystem
 
             var otherEntities = _entities
                 .Where(e => e is IUniqueEntity)
-                .Where( // Find all other entities of the same type
+                .Where( // Find all destination entities of the same type
                     e => entityType.Equals(e.GetType()))
                 .Where( // Which have an equivalent hash
                     e => ((IUniqueEntity)e).EntityHash() == entityHash)
@@ -106,83 +106,82 @@ namespace Solar.EntitySystem
             return otherEntities.FirstOrDefault();
         }
 
-        /// <param name="other">The other manager to merge with</param>
+        /// <param name="destination">The destination manager to merge into</param>
         /// <returns>
-        /// <see langword="true"/> if <paramref name="other"/> is a compatible <see cref="EntityManager"/>. They must have the same maximal type and not be the same manager<br/>
+        /// <see langword="true"/> if <paramref name="destination"/> is a compatible <see cref="EntityManager"/>. They must have the same maximal type and not be the same manager<br/>
         /// <see langword="false"/> otherwise.
         /// </returns>
-        public bool CanMerge(IMergeable other)
+        public bool CanMergeInto(IMergeable destination)
         {
-            if (other is not EntityManager)
+            if (destination is not EntityManager)
                 return false;
 
-            if (MaximalEntityType != ((EntityManager)other).MaximalEntityType)
+            if (MaximalEntityType != ((EntityManager)destination).MaximalEntityType)
                 return false;
 
-            return !ReferenceEquals(this, other);
+            return !ReferenceEquals(this, destination);
         }
 
         /// <summary>
-        /// Transfers all the objects of the <paramref name="other"/> manager to this manager, provided that they are compatible.<br/>
+        /// Transfers all the objects of this manager to the <paramref name="destination"/> manager, provided that they are compatible.<br/>
         /// Unique entities with equivalent instances in both managers will be merged together
         /// </summary>
         /// <remarks>
-        /// Throws <see cref="CannotMergeException"/> if <paramref name="other"/> is not a compatible manager<br/>
-        /// See <seealso cref="CanMerge(IMergeable)"/>
+        /// Throws <see cref="CannotMergeException"/> if <paramref name="destination"/> is not a compatible manager<br/>
+        /// See <seealso cref="CanMergeInto(IMergeable)"/>
         /// </remarks>
-        /// <param name="other"></param>
+        /// <param name="destination">The destination manager to merge into</param>
         /// <exception cref="CannotMergeException"></exception>
-        public void Merge(IMergeable other)
+        public void MergeInto(IMergeable destination)
         {
-            if (!CanMerge(other))
-                throw new CannotMergeException("EntityManager instance could not merge with another instance", this, other);
+            if (!CanMergeInto(destination))
+                throw new CannotMergeException($"Could not merge EntityManager with instance of type {destination.GetType().FullName}", this, destination);
 
-            var otherManager = (EntityManager)other;
+            var destManager = (EntityManager)destination;
 
-            // Iterate over the entities of the other manager, transferring their handles
+            // Iterate our entities, transferring their handles
             CleanupAllHandles();
-            otherManager.CleanupAllHandles();
+            destManager.CleanupAllHandles();
 
-            for (int i = otherManager._entities.Count - 1; i >= 0; i--)
+            for (int i = _entities.Count - 1; i >= 0; i--)
             {
-                ModelEntity entityToTransfer = otherManager._entities[i];
-                var entityHandlesToTransfer = otherManager._entityHandles[entityToTransfer];
+                ModelEntity entityToTransfer = _entities[i];
+                var entityHandlesToTransfer = _entityHandles[entityToTransfer];
 
-                // For unique entities, verify if there's another equivalent, and merge as needed
+                // For unique entities, verify if there's an equivalent already and merge if needed
                 if (entityToTransfer is IUniqueEntity)
                 {
-                    // Find the equivalent entity if it exists
-                    var existingEntity = FindEquivalentEntity((IUniqueEntity)entityToTransfer);
+                    // Find the equivalent entity in the destination manager, if it exists
+                    var existingEntity = destManager.FindEquivalentEntity((IUniqueEntity)entityToTransfer);
 
                     // Merge into it if it exists
                     if (existingEntity is not null)
                     {
-                        existingEntity.Merge((IMergeable)entityToTransfer);
+                        ((IUniqueEntity)entityToTransfer).MergeInto(existingEntity);
 
                         // Transfer handles
-                        _entityHandles[(ModelEntity)existingEntity].AddRange(entityHandlesToTransfer);
+                        destManager._entityHandles[(ModelEntity)existingEntity].AddRange(entityHandlesToTransfer);
                         foreach (var handle in entityHandlesToTransfer.GetLiveTargets())
                             handle.ReplaceReferent((ModelEntity)existingEntity);
                         entityHandlesToTransfer.Clear();
 
                         // Remove from the old manager
-                        otherManager._entities.RemoveAt(i);
-                        otherManager._entityHandles.Remove(entityToTransfer);
+                        _entities.RemoveAt(i);
+                        _entityHandles.Remove(entityToTransfer);
 
                         entityToTransfer.Invalidate(); // We don't need to move the old entity in this case
                         continue;
                     }
                 }
 
-                // Move the entity to the current manager
-                _entities.Add(entityToTransfer);
-                _entityHandles[entityToTransfer] = [.. entityHandlesToTransfer];
-                entityToTransfer.OwningTable = this;
+                // Otherwise, just move the entity to the destination manager
+                destManager._entities.Add(entityToTransfer);
+                destManager._entityHandles[entityToTransfer] = [.. entityHandlesToTransfer];
+                entityToTransfer.OwningTable = destManager;
 
                 // Remove from the old manager
-                otherManager._entities.RemoveAt(i);
-                otherManager._entityHandles.Remove(entityToTransfer);
-
+                _entities.RemoveAt(i);
+                _entityHandles.Remove(entityToTransfer);
             }
         }
 

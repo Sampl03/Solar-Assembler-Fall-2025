@@ -5,7 +5,7 @@ namespace Solar.EntitySystem.Behavior
     /// <summary>
     /// Represents an entity that should be unique within its manager<br/>
     /// <br/>
-    /// Merging will only apply when two managers merge and they contain <see cref="IUniqueEntity"/> entities that are equivalent to each other<br/>
+    /// Merging will only apply when two managers merge and they contain <see cref="IUniqueEntity"/> entities that are equivalent to each destination<br/>
     /// The default behaviour is such cases is to do nothing, although it can be customized.<br/>
     /// </summary>
     /// <remarks>
@@ -15,32 +15,32 @@ namespace Solar.EntitySystem.Behavior
     /// </remarks>
     public interface IUniqueEntity : IMergeable
     {
-        /// <param name="other">The other entity</param>
+        /// <param name="destination">The destination entity to merge into to test</param>
         /// <returns>
         /// (Default behaviour)<br/>
-        /// <see langword="true"/> if this entity and <paramref name="other"/> are of the same run-time type<br/>
+        /// <see langword="true"/> if <paramref name="destination"/> and this entity are of the same run-time type and are equivalent<br/>
         /// <see langword="false"/> otherwise
         /// </returns>
-        bool IMergeable.CanMerge(IMergeable other)
+        bool IMergeable.CanMergeInto(IMergeable destination)
         {
-            if (GetType() != other.GetType())
+            if (GetType() != destination.GetType())
                 return false;
 
-            return EntityEquivalent((ModelEntity)other);
+            return EntityEquivalent((ModelEntity)destination);
         }
 
         /// <summary>
-        /// Merge this entity with another entity. Used in <see cref="EntityManager"/> during manager merges.<br/>
+        /// Merge this entity into <paramref name="destination"/>. Used in <see cref="EntityManager"/> during manager merges.<br/>
         /// </summary>
         /// <remarks>
         /// Throws <see cref="CannotMergeException"/> if the two entities are not of the same type and equivalent
         /// </remarks>
-        /// <param name="other"></param>
+        /// <param name="destination"></param>
         /// <exception cref="CannotMergeException"></exception>
-        void IMergeable.Merge(IMergeable other)
+        void IMergeable.MergeInto(IMergeable destination)
         {
-            if (!CanMerge(other))
-                throw new CannotMergeException($"Cannot merge type '{GetType().FullName}' with type '{other.GetType().FullName}'");
+            if (!CanMergeInto(destination))
+                throw new CannotMergeException($"Could not merge entity of type '{GetType().FullName}' into entity of type '{destination.GetType().FullName}'", this, destination);
         }
 
         /// <summary>
@@ -64,7 +64,7 @@ namespace Solar.EntitySystem.Behavior
         /// <remarks>
         /// It is the reponsibility of the implementor to check <paramref name="other"/>'s type
         /// </remarks>
-        /// <param name="other">The other entity</param>
+        /// <param name="other">The destination entity</param>
         /// <returns>
         /// Whether or not the entities are equivalent
         /// </returns>

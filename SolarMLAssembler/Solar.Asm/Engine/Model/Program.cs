@@ -28,41 +28,41 @@ namespace Solar.Asm.Engine.Model
             Expressions     = new(this, typeof(Expression<>) );
         }
 
-        public bool CanMerge(IMergeable other)
+        public bool CanMergeInto(IMergeable destination)
         {
-            // Can't merge a non-Program into self
-            if (typeof(Program) != other.GetType())
+            // Can't merge into a non-program
+            if (destination is not Program)
                 return false;
 
             // Recast for ease of use
-            Program otherProgram = (Program)other;
+            Program destProgram = (Program)destination;
 
             // Managers must be able to merge
-            if (!CodeEntities.CanMerge(otherProgram.CodeEntities))
+            if (!CodeEntities.CanMergeInto(destProgram.CodeEntities))
                 return false;
-            if (!Meta.CanMerge(otherProgram.Meta))
+            if (!Meta.CanMergeInto(destProgram.Meta))
                 return false;
-            if (!Symbols.CanMerge(otherProgram.Symbols))
+            if (!Symbols.CanMergeInto(destProgram.Symbols))
                 return false;
-            if (!Expressions.CanMerge(otherProgram.Expressions))
+            if (!Expressions.CanMergeInto(destProgram.Expressions))
                 return false;
 
             return true;
         }
 
-        public void Merge(IMergeable other)
+        public void MergeInto(IMergeable destination)
         {
-            if (!CanMerge(other))
-                throw new CannotMergeException("Cannot merge Program with an entity that is not also a Program", this, other);
+            if (!CanMergeInto(destination))
+                throw new CannotMergeException($"Could not merge Program into an entity of type {destination.GetType()}", this, destination);
 
             // Recast for ease of use
-            Program otherProgram = (Program)other;
+            Program destProgram = (Program)destination;
 
-            // Merge
-            CodeEntities.Merge(otherProgram.CodeEntities);
-            Meta.Merge(otherProgram.Meta);
-            Symbols.Merge(otherProgram.Symbols);
-            Expressions.Merge(otherProgram.Expressions);
+            // Merge destination program's managers into ours
+            CodeEntities.MergeInto(destProgram.CodeEntities);
+            Meta.MergeInto(destProgram.Meta);
+            Symbols.MergeInto(destProgram.Symbols);
+            Expressions.MergeInto(destProgram.Expressions);
 
         }
     }

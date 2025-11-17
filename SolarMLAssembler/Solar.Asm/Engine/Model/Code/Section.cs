@@ -11,20 +11,20 @@ namespace Solar.Asm.Engine.Model.Code
 
         public SectionFlags Flags { get; init; } = flags;
 
-        public virtual bool CanMerge(IMergeable other)
+        public virtual bool CanMergeInto(IMergeable destination)
         {
-            if (other is not Section)
+            if (destination is not Section)
                 return false;
 
-            var otherSection = (Section)other;
+            var destSection = (Section)destination;
 
-            if (Name != otherSection.Name)
+            if (Name != destSection.Name)
                 return false;
 
-            return Flags.CanMerge(otherSection.Flags);
+            return Flags.CanMergeInto(destSection.Flags);
         }
 
-        public virtual void Merge(IMergeable other)
+        public virtual void MergeInto(IMergeable destination)
         {
             throw new NotImplementedException();
         }
@@ -36,7 +36,7 @@ namespace Solar.Asm.Engine.Model.Code
 
             var otherSection = (Section)other;
 
-            return CanMerge(otherSection.Flags);
+            return Flags.CanMergeInto(otherSection.Flags);
         }
 
         public virtual int EntityHash()

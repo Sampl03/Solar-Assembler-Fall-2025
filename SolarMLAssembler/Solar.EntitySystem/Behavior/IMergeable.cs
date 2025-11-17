@@ -11,24 +11,23 @@ namespace Solar.EntitySystem.Behavior
     public interface IMergeable
     {
         /// <summary>
-        /// Indicates whether this mergeable can merge with another.
+        /// Indicates whether this mergeable can merge into another.
         /// </summary>
-        /// <param name="other">The other mergeable</param>
+        /// <param name="destination">The destination mergeable to merge into</param>
         /// <returns>
         /// <see langword="true"/> if the two mergeables can merge<br/>
         /// <see langword="false"/> if not
         /// </returns>
-        bool CanMerge(IMergeable other);
+        bool CanMergeInto(IMergeable destination);
 
         /// <summary>
-        /// Merge two mergeables.<br/>
-        /// This method should call <see cref="WasMerged()"/> on <paramref name="other"/> if it has additional state to cleanup.
+        /// Merge this mergeable into <paramref name="destination"/>
         /// </summary>
         /// <remarks>
         /// Should throw <see cref="CannotMergeException"/> if the two entities cannot be merged.
         /// </remarks>
-        /// <param name="other">The other mergeable</param>
+        /// <param name="destination">The destination mergeable to merge into</param>
         /// <exception cref="CannotMergeException"></exception>
-        void Merge(IMergeable other);
+        void MergeInto(IMergeable destination);
     }
 }
