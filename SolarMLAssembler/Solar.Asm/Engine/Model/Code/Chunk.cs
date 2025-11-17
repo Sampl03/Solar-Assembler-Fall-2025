@@ -1,6 +1,4 @@
-﻿using Solar.EntitySystem;
-
-namespace Solar.Asm.Engine.Model.Code
+﻿namespace Solar.Asm.Engine.Model.Code
 {
     public abstract class Chunk : CodeEntity
     {
