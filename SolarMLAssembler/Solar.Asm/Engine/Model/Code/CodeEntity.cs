@@ -23,10 +23,10 @@ namespace Solar.Asm.Engine.Model.Code
         /// </returns>
         public abstract IReadOnlyList<byte> EmitBytes();
 
-        /// <returns>The number of emitted bytes, if applicable</returns>
-        public abstract long? CalculateByteSize();
+        /// <returns>The number of emitted bytes. By default, this is the size of whatever <see cref="EmitBytes"/> returns</returns>
+        public virtual long CalculateByteSize() => EmitBytes().LongCount();
 
-        /// <returns>The virtual address of the start of the virtual bytes, if applicable</returns>
-        public abstract long? CalculateAddress();
+        /// <returns>The offset of this entity from its parent's address in bytes (if applicable)</returns>
+        public abstract long CalculateByteOffset();
     }
 }

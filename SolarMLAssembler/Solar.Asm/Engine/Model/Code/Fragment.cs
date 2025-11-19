@@ -245,16 +245,16 @@ namespace Solar.Asm.Engine.Model.Code
             return _cachedBytes;
         }
 
-        public override long? CalculateByteSize() => EmitBytes().LongCount();
-
-        public override long? CalculateAddress()
+        /// <returns>The offset in bytes of this fragment from the start of its containing section</returns>
+        public override long CalculateByteOffset()
         {
             GuardValidity();
 
             if (PreviousFragment is null)
                 return 0;
 
-            return PreviousFragment.Ref!.CalculateAddress() + PreviousFragment.Ref!.CalculateByteSize();
+            // Address of this fragment is the address of the previous segment plus its size
+            return PreviousFragment.Ref!.CalculateByteOffset() + PreviousFragment.Ref!.CalculateByteSize();
         }
     }
 }

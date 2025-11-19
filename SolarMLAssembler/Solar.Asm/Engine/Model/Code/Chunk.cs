@@ -10,10 +10,15 @@ namespace Solar.Asm.Engine.Model.Code
 
         protected Chunk() : base() { }
 
-        public abstract byte[] ToBytes();
+        /// <returns>The offset in bytes of this chunk from the start of its containing fragment</returns>
+        public override long CalculateByteOffset()
+        {
+            GuardValidity();
 
-        public abstract int SizeBytes();
+            if (PreviousChunk is null)
+                return 0;
 
-        public abstract bool Shrink();
+            return PreviousChunk.Ref!.CalculateByteOffset() + PreviousChunk.Ref!.CalculateByteSize();
+        }
     }
 }

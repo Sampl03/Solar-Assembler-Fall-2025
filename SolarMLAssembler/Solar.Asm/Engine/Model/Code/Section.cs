@@ -21,7 +21,7 @@ namespace Solar.Asm.Engine.Model.Code
 
         public string Name { get; init; } = name;
 
-        public long? DesiredAddress { get; set; } = null;
+        public long DesiredAddress { get; set; } = 0;
 
         public SectionFlags Flags { get; init; } = flags;
         
@@ -291,17 +291,15 @@ namespace Solar.Asm.Engine.Model.Code
             return _cachedBytes;
         }
 
-        public override long? CalculateByteSize() => EmitBytes().LongCount();
-
         /// <inheritdoc/>
         /// <remarks>
-        /// <b>Note:</b> This is always <see langword="null"/> for Section instances.
+        /// <b>Note:</b> This is always equal to <see cref="DesiredAddress"/> for sections
         /// </remarks>
-        public sealed override long? CalculateAddress()
+        public sealed override long CalculateByteOffset()
         {
             GuardValidity();
 
-            return null;
+            return DesiredAddress;
         }
     }
 }
