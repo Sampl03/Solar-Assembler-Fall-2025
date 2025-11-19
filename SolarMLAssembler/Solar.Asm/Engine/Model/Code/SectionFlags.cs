@@ -50,7 +50,13 @@ namespace Solar.Asm.Engine.Model.Code
 
         public virtual bool CanMergeInto(IMergeable destination)
         {
+            if (destination is not SectionFlags)
+                return false;
+
             if (!IsMergeable)
+                return false;
+
+            if (!((SectionFlags)destination).IsMergeable)
                 return false;
 
             return Equals(destination);

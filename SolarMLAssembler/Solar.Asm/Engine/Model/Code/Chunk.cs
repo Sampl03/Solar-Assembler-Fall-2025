@@ -1,10 +1,14 @@
-﻿namespace Solar.Asm.Engine.Model.Code
+﻿using Solar.EntitySystem;
+
+namespace Solar.Asm.Engine.Model.Code
 {
     public abstract class Chunk : CodeEntity
     {
-        protected Chunk() : base()
-        {
-        }
+        // Fragment and PreviousChunk should only be set by the containing Fragment.
+        public EntityHandle<Fragment>? Fragment { get; internal set; }
+        public EntityHandle<Chunk>? PreviousChunk { get; internal set; }
+
+        protected Chunk() : base() { }
 
         public abstract byte[] ToBytes();
 

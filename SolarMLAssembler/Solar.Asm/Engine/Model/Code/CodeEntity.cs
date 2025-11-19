@@ -1,5 +1,4 @@
 ﻿using Solar.EntitySystem;
-using System.Reflection.Metadata.Ecma335;
 
 namespace Solar.Asm.Engine.Model.Code
 {
@@ -9,21 +8,20 @@ namespace Solar.Asm.Engine.Model.Code
     public abstract class CodeEntity : ModelEntity
     {
         /// <summary>
-        /// Returns the byte representation of this entity's data.
+        /// Indicates whether this entity requires recalculation as of the latest operation,<br/>
+        /// such as when an expression's value may still vary (e.g. symbols)
         /// </summary>
-        /// <remarks>
-        /// The <paramref name="mustRecalculate"/> param indicates whether this entity requires recalculation,
-        /// such as when a symbol couldn't be resolved or may be changed by a change in this instruction.
-        /// </remarks>
-        /// <param name="mustRecalculate">
-        /// If <see langword="true"/>, indicates that this entity requires a recalculation
-        /// such as if it refers to an uninitialised symbol or it changed size and refers to a symbol that may be affected.<br/>
-        /// If the results don't require recalculation, this should be <see langword="false"/>
-        /// </param>
+        public abstract bool NeedsRecalculation();
+
+        /// <summary>
+        /// Forces the entity to recalculate instead of using cached representation on any further calls
+        /// </summary>
+        public abstract void RequireRecalculation();
+
         /// <returns>
-        /// The byte representation of the entity as a byte enumerable
+        /// The byte representation of the entity as a byte list
         /// </returns>
-        public abstract IEnumerable<byte> EmitBytes(out bool mustRecalculate);
+        public abstract IReadOnlyList<byte> EmitBytes();
 
         /// <returns>The number of emitted bytes, if applicable</returns>
         public abstract long? CalculateByteSize();
