@@ -21,7 +21,10 @@ namespace Solar.Asm.Engine.Model.Code
 
         public string Name { get; init; } = name;
 
-        public long DesiredAddress { get; set; } = 0;
+        /// <summary>
+        /// The desired address of this section, in the units of the target architecture
+        /// </summary>
+        public ulong DesiredAddress { get; set; } = 0;
 
         public SectionFlags Flags { get; init; } = flags;
         
@@ -295,7 +298,7 @@ namespace Solar.Asm.Engine.Model.Code
         /// <remarks>
         /// <b>Note:</b> This is always equal to <see cref="DesiredAddress"/> for sections
         /// </remarks>
-        public sealed override long CalculateByteOffset()
+        public sealed override ulong CalculateMemCellOffset()
         {
             GuardValidity();
 

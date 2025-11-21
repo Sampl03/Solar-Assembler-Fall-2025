@@ -245,7 +245,7 @@ namespace Solar.Asm.Engine.Model.Code
         }
 
         /// <returns>The offset in bytes of this fragment from the start of its containing section</returns>
-        public override long CalculateByteOffset()
+        public override ulong CalculateMemCellOffset()
         {
             GuardValidity();
 
@@ -253,7 +253,7 @@ namespace Solar.Asm.Engine.Model.Code
                 return 0;
 
             // Address of this fragment is the address of the previous segment plus its size
-            return PreviousFragment.Ref!.CalculateByteOffset() + PreviousFragment.Ref!.CalculateByteSize();
+            return PreviousFragment.Ref!.CalculateMemCellOffset() + PreviousFragment.Ref!.CalculateMemSize();
         }
     }
 }

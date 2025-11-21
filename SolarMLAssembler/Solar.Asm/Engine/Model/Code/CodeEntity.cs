@@ -23,10 +23,23 @@ namespace Solar.Asm.Engine.Model.Code
         /// </returns>
         public abstract IReadOnlyList<byte> EmitBytes();
 
-        /// <returns>The number of emitted bytes. By default, this is the size of whatever <see cref="EmitBytes"/> returns</returns>
-        public virtual long CalculateByteSize() => EmitBytes().LongCount();
+        /// <returns>
+        /// The number of emitted memory cells.<br/>
+        /// Note that this value is not necessarily in bytes, but in memory cells defined by the architecture
+        /// </returns>
+        /// <remarks>=
+        /// By default, this is the size of whatever <see cref="EmitBytes"/> returns,
+        ///  divided by the number of bytes in a memory cell for the specified architecture
+        /// </remarks>
+        public virtual ulong CalculateMemSize() => (ulong)(
+            EmitBytes().LongCount() /
+            ((Program)OwningTable!.Context).ArchSpecs.MemoryCellSizeInBytes
+        );
 
-        /// <returns>The offset of this entity from its parent's address in bytes (if applicable)</returns>
-        public abstract long CalculateByteOffset();
+        /// <returns>
+        /// The offset of this entity from its parent's address in memory cells (if applicable)<br/>
+        /// Note that this value is not necessarily in bytes, but in memory cells defined by the architecture
+        /// </returns>
+        public abstract ulong CalculateMemCellOffset();
     }
 }

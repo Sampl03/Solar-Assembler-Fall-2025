@@ -4,6 +4,7 @@ using Solar.EntitySystem.Exceptions;
 
 using Solar.Asm.Engine.Model.Code;
 using Solar.Asm.Engine.Model.Meta;
+using Solar.Asm.Engine.Model.Meta.IO;
 using Solar.Asm.Engine.Model.Symbols;
 using Solar.Asm.Engine.Model.Expressions;
 
@@ -13,22 +14,25 @@ namespace Solar.Asm.Engine.Model
     /// Top-level Context for Solar ML Assembler programs.<br/>
     /// Contains the <see cref="EntityManager"/> instances to which all Model entities belong.
     /// </summary>
-    public class Program : IContext, IMergeable
+    public abstract class Program : IContext, IMergeable
     {
-        public EntityManager CodeEntities { get; init; }
-        public EntityManager Meta { get; init; }
-        public EntityManager Symbols { get; init; }
-        public EntityManager Expressions { get; init; }
+        public ArchitectureSpecs ArchSpecs { get; init; }
 
-        public Program()
+        protected EntityManager CodeEntities { get; init; }
+        protected EntityManager Meta { get; init; }
+        protected EntityManager Symbols { get; init; }
+        protected EntityManager Expressions { get; init; }
+
+        public Program(ArchitectureSpecs architectureSpecs)
         {
+            ArchSpecs       = architectureSpecs;
             CodeEntities    = new(this, typeof(CodeEntity)   );
             Meta            = new(this, typeof(MetaEntity)   );
             Symbols         = new(this, typeof(Symbol)       );
             Expressions     = new(this, typeof(Expression<>) );
         }
 
-        public bool CanMergeInto(IMergeable destination)
+        public virtual bool CanMergeInto(IMergeable destination)
         {
             // Can't merge into a non-program
             if (destination is not Program)
@@ -36,6 +40,10 @@ namespace Solar.Asm.Engine.Model
 
             // Recast for ease of use
             Program destProgram = (Program)destination;
+
+            // Architectures must be compatible
+            if (ArchSpecs != destProgram.ArchSpecs)
+                return false;
 
             // Managers must be able to merge
             if (!CodeEntities.CanMergeInto(destProgram.CodeEntities))
@@ -50,7 +58,7 @@ namespace Solar.Asm.Engine.Model
             return true;
         }
 
-        public void MergeInto(IMergeable destination)
+        public virtual void MergeInto(IMergeable destination)
         {
             if (!CanMergeInto(destination))
                 throw new CannotMergeException($"Could not merge Program into an entity of type {destination.GetType()}", this, destination);

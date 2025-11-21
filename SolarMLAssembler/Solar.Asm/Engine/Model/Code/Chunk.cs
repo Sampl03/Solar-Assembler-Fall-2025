@@ -11,14 +11,14 @@ namespace Solar.Asm.Engine.Model.Code
         protected Chunk() : base() { }
 
         /// <returns>The offset in bytes of this chunk from the start of its containing fragment</returns>
-        public override long CalculateByteOffset()
+        public override ulong CalculateMemCellOffset()
         {
             GuardValidity();
 
             if (PreviousChunk is null)
                 return 0;
 
-            return PreviousChunk.Ref!.CalculateByteOffset() + PreviousChunk.Ref!.CalculateByteSize();
+            return PreviousChunk.Ref!.CalculateMemCellOffset() + PreviousChunk.Ref!.CalculateMemSize();
         }
     }
 }
