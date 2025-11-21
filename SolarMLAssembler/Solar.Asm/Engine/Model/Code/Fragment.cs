@@ -8,7 +8,10 @@ namespace Solar.Asm.Engine.Model.Code
     /// They allow sections to merge back together smoothly when spread across multiple sources
     /// or when non-contiguous within a single source
     /// </summary>
-    public class Fragment : CodeEntity
+    /// <remarks>
+    /// Fragments are fixed classes and cannot be extended. Subclass <see cref="Section"/> instead
+    /// </remarks>
+    public sealed class Fragment : CodeEntity
     {
         private readonly IList<EntityHandle<Chunk>> _chunkHandles = [];
 
@@ -26,7 +29,7 @@ namespace Solar.Asm.Engine.Model.Code
         /// Adds the chunk to the end of this chunk
         /// </summary>
         /// <param name="chunk"></param>
-        public virtual void AddChunk(Chunk chunk) => InsertChunk(_chunkHandles.Count, chunk);
+        public void AddChunk(Chunk chunk) => InsertChunk(_chunkHandles.Count, chunk);
 
         /// <summary>
         /// Adds the chunk at the specified location in this chunk
@@ -35,7 +38,7 @@ namespace Solar.Asm.Engine.Model.Code
         /// <param name="chunk"></param>
         /// <exception cref="IndexOutOfRangeException"></exception>
         /// <exception cref="SmlaCannotAddException"></exception>
-        public virtual void InsertChunk(int i, Chunk chunk)
+        public void InsertChunk(int i, Chunk chunk)
         {
             GuardValidity();
 
@@ -89,7 +92,7 @@ namespace Solar.Asm.Engine.Model.Code
         /// <see langword="true"/> if the chunk was removed<br/>
         /// <see langword="false"/> if the chunk is not within this fragment
         /// </returns>
-        public virtual bool RemoveChunk(Chunk chunk)
+        public bool RemoveChunk(Chunk chunk)
         {
             GuardValidity();
 
@@ -136,14 +139,14 @@ namespace Solar.Asm.Engine.Model.Code
         /// <see langword="true"/> if <paramref name="chunk"/> is stored in this fragment<br/>
         /// <see langword="false"/> otherwise.
         /// </returns>
-        public virtual bool Contains(Chunk chunk) => IndexOf(chunk) != -1;
+        public bool Contains(Chunk chunk) => IndexOf(chunk) != -1;
 
         /// <param name="chunk"></param>
         /// <returns>
         /// The index of the unique handle to <paramref name="chunk"/> in this fragment,
         /// or <see langword="-1"/> if not located in this fragment
         /// </returns>
-        public virtual int IndexOf(Chunk chunk)
+        public int IndexOf(Chunk chunk)
         {
             GuardValidity();
 
@@ -161,10 +164,6 @@ namespace Solar.Asm.Engine.Model.Code
 
         protected override bool OnValidityGuard()
         {
-            // If the section is null, then this fragment is unassigned and cannot be used
-            if (Section is null)
-                return false;
-
             /* We need to check that all the links managed by this fragment are valid */
 
             // If there are no chunks, it's fine
