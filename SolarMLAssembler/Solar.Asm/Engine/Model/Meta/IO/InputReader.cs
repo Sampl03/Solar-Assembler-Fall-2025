@@ -2,7 +2,7 @@
 
 namespace Solar.Asm.Engine.Model.Meta.IO
 {
-    public abstract class InputReader : MetaEntity
+    public abstract class InputReader
     {
         protected InputReader() : base()
         {

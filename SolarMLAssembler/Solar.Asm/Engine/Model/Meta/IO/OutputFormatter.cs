@@ -2,10 +2,7 @@
 
 namespace Solar.Asm.Engine.Model.Meta.IO
 {
-    public abstract class OutputFormatter : ModelEntity
+    public abstract class OutputFormatter
     {
-        protected OutputFormatter() : base()
-        {
-        }
     }
 }
