@@ -101,7 +101,7 @@
         public bool IsAncestorOf(QualifiedName other) => this != other && GetClosestSharedNamespace(other) == this;
         public bool IsDescendantOf(QualifiedName other) => other.IsAncestorOf(this);
         public bool IsParentOf(QualifiedName other) => other.Namespace == this;
-        public bool IsChildOf(QualifiedName other) => Namespace == this;
+        public bool IsChildOf(QualifiedName other) => Namespace == other;
         public bool IsSiblingOf(QualifiedName other) => this != other && Namespace == other.Namespace;
 
         /* Shorthand for methods
