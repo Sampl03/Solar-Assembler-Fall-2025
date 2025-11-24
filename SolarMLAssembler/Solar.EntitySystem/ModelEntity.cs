@@ -121,6 +121,9 @@ namespace Solar.EntitySystem
             if (!IsValid)
                 return false;
 
+            // Let subclasses clean up
+            OnInvalidated();
+
             // Notify the owning table. It is in charge of verifying that there are no more active handles
             OwningTable!.UnregisterEntity(this);
 
@@ -129,5 +132,7 @@ namespace Solar.EntitySystem
 
             return true;
         }
+
+        protected virtual void OnInvalidated() { }
     }
 }
