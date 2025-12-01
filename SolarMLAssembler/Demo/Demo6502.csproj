@@ -15,7 +15,6 @@
 
   <ItemGroup>
     <Folder Include="Mos6502\" />
-    <Folder Include="EmuRom\" />
   </ItemGroup>
 
 </Project>
