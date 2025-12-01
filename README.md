@@ -5,65 +5,67 @@
 *This repository was created for the University of Ottawa CSI 4900 class of Fall 2025*\
 *It contains a subset of features suitable to the 4 months of the Honours Project, and may be expanded upon at a later date, in a separate repository*
 
-**NOTE:** This README provides a high-level overview. For full technical detail, see the project wiki\
-TODO: Add project wiki link
+**NOTE:** This README provides a high-level overview. For full technical detail, see the [project wiki](https://github.com/Sampl03/Solar-Assembler-Fall-2025/wiki)
 
 ---
 
-The **Solar Multilingual Assembler (SMLA)** project is an experimental assembler framework written in C# with a focus on implementing data structures that facilitate expressivity, flexibility and extensibility.
+The **Solar Multilingual Assembler (SMLA)** project is an experimental assembler framework written in C# with a focus on implementing a data model that facilitates expressivity, flexibility and extensibility.
 
 It takes inspiration from the *Intermediate Representation* (IR) code of contemporary compilers, representing assembly code in a language-agnostic way that can be manipulated by a shared corpus of tools. This allows directives, opcodes, input/output formats and more utilities to be swapped in and out and combined without having to modify the front-end of the compiler.
 
 By doing so, the time cost of creating new tooling while working on custom architectures is severely reduced, and the expressivity of a more complex system is kept between multiple different projects.
 
-The *SMLA* fundamentally parses the **Control and Expression Evaluation Language (CEEL)**, a custom *Domain-Specific Language* designed to control and enhance the assembly process.
+Fundamentally, an *SMLA* session reads input from a source file into the data model, manipulates the data model, and returns the model to be encoded into an output format. Sessions can create new sessions, allowing for the merging of several source files, provided that the formats are all compatible.
 
-It enables:
-- Complex mathematical expression evaluation
-- Conditional assembly
-- Metadata access and mutation
-- Reflection and inspection of program state
-- Plugin integration
-- Embedding of external data in several formats (e.g., binaries, source files, object files)
-- Support for multiple output formats (e.g., flat binary, simple disassembly, executable)
+There is built-in support for **Expressions** which can be reevaluated as needed, and many components of the model can be extended to add new behaviour.
 
-Regular assembly, which can itself contain embedded mathematical expressions and directives, is embedded within top-level *CEEL* blocks.
+The name **Multilingual** reflects its ability to work with multiple different assembly languages as well as multiple input and output formats.
 
-The name **Multilingual** reflects its ability to work with multiple different assembly languages (as defined by an opcode database), with C# for plugins, and with *CEEL* for assembly orchestration.
 
 ### The Goals of This Project
 
-Due to time constraints and the inherent extensibility of the assembler, this repository will focus on implementing the core data structure, the *CEEL*-capable front end parser, the plugin system, a command-line tool, and a small demo program.
-
-Note that due to its complexity, the ability to define functions/macros directly in *CEEL* will not be implemented for the Honours Project.
-
-Please see the [Roadmap](#roadmap) for a detailed breakdown.
+Due to time constraints and the inherent extensibility of the assembler, this repository will focus on implementing the core data structure, the plugin system, a command-line tool, and a small demo plugin and program pair.
 
 #### Demo
 
-In order to demo the assembler, a small emulator (see [Emulator](/Emulator/README.md)) capable of running 6502 assembly will be implemented.\
-It will utilise a toy executable format, supported by a custom C# plugin.
+In order to demo the assembler, a small 6502 implementation of the QOI image format will be written, assembled, and then run on the [Easy 6502 Simulator](https://skilldrick.github.io/easy6502/simulator.html)
 
-A snake program (see [Snake](/Snake/README.md)) will be written, assembled, and then run on this emulator.
+See [QOI Demo](https://github.com/Sampl03/Solar-Assembler-Fall-2025/wiki/QOI-Demo)
 
 ## Project Structure
-TODO: Go over all the folders:\
-- SolarMLAssembler (The Core and Console)
-- Emulator (The Emulator and its SMLA plugins for 6502 and its custom output format)
-- Snake (The Snake game source code)
 
-## Roadmap
-TODO: Write down step-by-step goals for 
+This repository contains a Visual Studio Solution with 5 projects:
+
+| Project | Description |
+|---|---|
+| [Solar.EntitySystem](/SolarMLAssembler/Solar.EntitySystem)             | The overarching entity system |
+| [Engine.Model](/SolarMLAssembler/Solar.Asm/Engine/Model)               | The library which defines the base data model classes |
+| [Engine.Orchestrator](/SolarMLAssembler/Solar.Asm/Engine/Orchestrator) | The library which can be called to assemble a source file |
+| [CLI](/SolarMLAssembler/Solar.Asm/CLI)                                 | The default command-line utility which wraps around the Orchestrator |
+| [Demo6502](/SolarMLAssembler/Demo)                                     | The plugin implementation for 6502 assembly |
 
 ## Installation
-TODO: Show what version of C# to have\
-TODO: Show how to download and setup the package\
-TODO: Show how to add plugins
+
+This project is built on C# 12.
+
+From source, simply build the `CLI` project. It will generate the following files:\
+TODO: Explain what each DLL is
+
+As well as the following folders:\
+TODO: Explain Plugins and SystemPlugins
+
+In order to run the Demo, build the `Demo6502` project, and add the generated `Demo6502.plugin.dll` file to the "Plugins" folders.
+
+Other plugins can be added by adding their DLLs to the `Plugins` or `SystemPlugins` folders
 
 ## Usage
 TBD\
 TODO: Show how to use the command-line for basic assembly\
 TODO: Show how to hook into the assembler directly (maybe)
+
+## Credits
+
+- Nick Morgan ([@skilldrick](https://github.com/skilldrick)) and other contributors of the [easy6502 repository](https://github.com/skilldrick/easy6502)
 
 ## Contacts
 
