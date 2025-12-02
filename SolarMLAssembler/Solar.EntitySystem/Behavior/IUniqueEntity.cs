@@ -26,6 +26,9 @@ namespace Solar.EntitySystem.Behavior
             if (GetType() != destination.GetType())
                 return false;
 
+            if (ReferenceEquals(this, destination))
+                return false;
+
             return EntityEquivalent((ModelEntity)destination);
         }
 
