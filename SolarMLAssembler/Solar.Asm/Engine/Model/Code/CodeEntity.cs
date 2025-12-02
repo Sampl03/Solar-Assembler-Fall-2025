@@ -8,6 +8,18 @@ namespace Solar.Asm.Engine.Model.Code
     public abstract class CodeEntity : ModelEntity
     {
         /// <summary>
+        /// The Program in which this symbol was declared
+        /// </summary>
+        public Program OwningProgram
+        {
+            get
+            {
+                GuardValidity();
+                return (Program)OwningTable!.Context;
+            }
+        }
+
+        /// <summary>
         /// Indicates whether this entity requires recalculation as of the latest operation,<br/>
         /// such as when an expression's value may still vary (e.g. symbols)
         /// </summary>

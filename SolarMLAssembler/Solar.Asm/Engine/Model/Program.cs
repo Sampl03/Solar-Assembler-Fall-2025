@@ -14,23 +14,35 @@ namespace Solar.Asm.Engine.Model
     /// Top-level Context for Solar ML Assembler programs.<br/>
     /// Contains the <see cref="EntityManager"/> instances to which all Model entities belong.
     /// </summary>
+    /// <remarks>
+    /// The specific <see cref="Program"/> instance should be provided by an <see cref="OutputFormatter">
+    /// </remarks>
     public abstract class Program : IContext, IMergeable
     {
-        public ArchitectureSpecs ArchSpecs { get; init; }
+        public ArchitectureSpecs ArchSpecs { get => AssemblyDialect.ArchSpecs; }
 
-        protected EntityManager CodeEntities { get; init; }
-        protected EntityManager Meta { get; init; }
-        protected EntityManager Symbols { get; init; }
-        protected EntityManager Expressions { get; init; }
+        public required OutputFormatter Outputter { get; init; }
+        public required InputReader Inputter { get; init; }
+        public required AssemblyParser AssemblyDialect { get; init; }
 
-        public Program(ArchitectureSpecs architectureSpecs)
+        public EntityManager CodeEntities { get; init; }
+        public EntityManager Meta { get; init; }
+        public EntityManager Symbols { get; init; }
+        public EntityManager Expressions { get; init; }
+
+        public Program()
         {
-            ArchSpecs       = architectureSpecs;
             CodeEntities    = new(this, typeof(CodeEntity)   );
             Meta            = new(this, typeof(MetaEntity)   );
             Symbols         = new(this, typeof(Symbol)       );
             Expressions     = new(this, typeof(Expression<>) );
         }
+
+        public abstract Section CreateOrGetSection();
+
+        public abstract Symbol CreateOrGetSymbol();
+
+        public abstract void FinalizeSymbols();
 
         public virtual bool CanMergeInto(IMergeable destination)
         {

@@ -1,4 +1,4 @@
-﻿namespace Solar.Asm.Engine.Model.Meta
+﻿namespace Solar.Asm.Engine.Model.Meta.IO
 {
     public enum Endianness { BigEndian, LittleEndian }
 
@@ -14,6 +14,70 @@
     /// </summary>
     public readonly record struct ArchitectureSpecs
     {
+        public readonly ulong MemoryCellMask => (0x1UL << 8 * MemoryCellSizeInBytes) - 1;
+        public readonly ulong WordMask => (0x1UL << 8 * WordSizeInCells * MemoryCellSizeInBytes) - 1;
+        public readonly ulong AddressMask => (0x1UL << 8 * AddressSizeInCells * MemoryCellSizeInBytes) - 1;
+
+        public readonly string ArchitectureIdCode;
+        public readonly byte MemoryCellSizeInBytes;
+        public readonly byte WordSizeInCells;
+        public readonly byte AddressSizeInCells;
+        public readonly Endianness Endianess;
+        public readonly Endianness InternalEndianness;
+
+        public ArchitectureSpecs(
+            string archIdCode,
+            byte wordSizeInCells = 1,
+            byte addrSizeInCells = 1,
+            byte memoryCellInBytes = 1,
+            Endianness endianness = Endianness.LittleEndian,
+            Endianness internalEndianness = Endianness.BigEndian
+        )
+        {
+            // Verify valid memory cell size (between 1 and 8 bytes)
+            switch (memoryCellInBytes)
+            {
+                case >= 1 and <= 8:
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(memoryCellInBytes), "This assembler only supports cell sizes between 1 and 8 bytes in size");
+            }
+
+            // Verify word size (between 1 and 8 bytes)
+            switch (memoryCellInBytes * wordSizeInCells)
+            {
+                case >= 1 and <= 8:
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(wordSizeInCells), "This assembler only supports word sizes between 1 and 8 bytes in size");
+            }
+
+            // Verify word size (between 1 and 8 bytes)
+            switch (memoryCellInBytes * wordSizeInCells)
+            {
+                case >= 1 and <= 8:
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(wordSizeInCells), "This assembler only supports word sizes between 1 and 8 bytes in size");
+            }
+
+            // Verify address size (between 1 and 8 bytes)
+            switch (memoryCellInBytes * addrSizeInCells)
+            {
+                case >= 1 and <= 8:
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(addrSizeInCells), "This assembler only supports address sizes between 1 and 8 bytes in size");
+            }
+
+            ArchitectureIdCode = archIdCode;
+            MemoryCellSizeInBytes = memoryCellInBytes;
+            WordSizeInCells = wordSizeInCells;
+            AddressSizeInCells = addrSizeInCells;
+            Endianess = endianness;
+            InternalEndianness = internalEndianness;
+        }
+
         public readonly ulong CellFromBytes(byte[] bytes)
         {
             if (bytes.Length != MemoryCellSizeInBytes)
@@ -144,66 +208,5 @@
         }
 
         public readonly byte[] AddressToBytes(ulong address) => ValueToNCellBytes(address, AddressSizeInCells);
-
-        public readonly ulong MemoryCellMask => (0x1UL << (8 * MemoryCellSizeInBytes)) - 1;
-        public readonly ulong WordMask => (0x1UL << (8 * WordSizeInCells * MemoryCellSizeInBytes)) - 1;
-        public readonly ulong AddressMask => (0x1UL << (8 * AddressSizeInCells * MemoryCellSizeInBytes)) - 1;
-
-        public readonly byte MemoryCellSizeInBytes;
-        public readonly byte WordSizeInCells;
-        public readonly byte AddressSizeInCells;
-        public readonly Endianness Endianess;
-        public readonly Endianness InternalEndianness;
-
-        public ArchitectureSpecs(
-            byte wordSizeInCells = 1,
-            byte addrSizeInCells = 1,
-            byte memoryCellInBytes = 1,
-            Endianness endianness = Endianness.LittleEndian,
-            Endianness internalEndianness = Endianness.BigEndian
-        )
-        {
-            // Verify valid memory cell size (between 1 and 8 bytes)
-            switch (memoryCellInBytes)
-            {
-                case >= 1 and <= 8:
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(memoryCellInBytes), "This assembler only supports cell sizes between 1 and 8 bytes in size");
-            }
-
-            // Verify word size (between 1 and 8 bytes)
-            switch (memoryCellInBytes * wordSizeInCells)
-            {
-                case >= 1 and <= 8:
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(wordSizeInCells), "This assembler only supports word sizes between 1 and 8 bytes in size");
-            }
-
-            // Verify word size (between 1 and 8 bytes)
-            switch (memoryCellInBytes * wordSizeInCells)
-            {
-                case >= 1 and <= 8:
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(wordSizeInCells), "This assembler only supports word sizes between 1 and 8 bytes in size");
-            }
-
-            // Verify address size (between 1 and 8 bytes)
-            switch (memoryCellInBytes * addrSizeInCells)
-            {
-                case >= 1 and <= 8:
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(addrSizeInCells), "This assembler only supports address sizes between 1 and 8 bytes in size");
-            }
-
-            MemoryCellSizeInBytes = memoryCellInBytes;
-            WordSizeInCells = wordSizeInCells;
-            AddressSizeInCells = addrSizeInCells;
-            Endianess = endianness;
-            InternalEndianness = internalEndianness;
-        }
     }
 }
