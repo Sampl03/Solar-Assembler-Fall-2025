@@ -84,6 +84,21 @@ namespace Solar.Asm.Engine.Model.Symbols
         /// </summary>
         public ulong MemCellOffset { get; set; } = 0;
 
+        {
+            GuardValidity();
+
+            // Label symbol's value is section address + fragment offset + chunk offset + mem cell offset
+
+            return Target switch
+            {
+                SymbolTarget.ABSOLUTE => AbsoluteValue,
+                SymbolTarget.SECTION => TargetSection?.Ref!.CalculateMemCellVirtualAddress() ?? throw new SmlaInvalidSymbolException("Tried getting value of section symbol with null target section", this),
+                SymbolTarget.LABEL => (TargetChunk?.Ref!.CalculateMemCellVirtualAddress() ?? throw new SmlaInvalidSymbolException("Tried getting value of label symbol with null target chunk", this)) + MemCellOffset,
+                SymbolTarget.UNDEFINED => 0L, // Undefined symbols default to 0
+                _ => throw new SmlaInvalidSymbolException("Tried getting value of symbol with invalid target type", this),
+            };
+        }
+
         #endregion
 
         #region Attribute Management

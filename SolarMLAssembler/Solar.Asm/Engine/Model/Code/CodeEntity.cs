@@ -49,9 +49,15 @@ namespace Solar.Asm.Engine.Model.Code
         );
 
         /// <returns>
-        /// The offset of this entity from its parent's address in memory cells (if applicable)<br/>
+        /// The offset of this entity from its parent's address in memory cells<br/>
         /// Note that this value is not necessarily in bytes, but in memory cells defined by the architecture
         /// </returns>
         public abstract ulong CalculateMemCellOffset();
+
+        /// <returns>
+        /// The virtual address of this entity in memory cells<br/>
+        /// Note that this value is not necessarily in bytes, but in memory cells defined by the architecture
+        /// </returns>
+        public abstract ulong CalculateMemCellVirtualAddress();
     }
 }

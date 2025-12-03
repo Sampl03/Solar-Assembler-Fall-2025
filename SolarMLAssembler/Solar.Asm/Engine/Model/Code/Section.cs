@@ -294,11 +294,18 @@ namespace Solar.Asm.Engine.Model.Code
             return _cachedBytes;
         }
 
+        public override ulong CalculateMemCellOffset()
+        {
+            GuardValidity();
+
+            return 0L;
+        }
+
         /// <inheritdoc/>
         /// <remarks>
         /// <b>Note:</b> This is always equal to <see cref="DesiredAddress"/> for sections
         /// </remarks>
-        public sealed override ulong CalculateMemCellOffset()
+        public sealed override ulong CalculateMemCellVirtualAddress()
         {
             GuardValidity();
 

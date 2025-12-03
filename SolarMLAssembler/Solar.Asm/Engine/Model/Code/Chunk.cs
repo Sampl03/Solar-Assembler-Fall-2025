@@ -10,8 +10,7 @@ namespace Solar.Asm.Engine.Model.Code
 
         protected Chunk() : base() { }
 
-        /// <returns>The offset in bytes of this chunk from the start of its containing fragment</returns>
-        public override ulong CalculateMemCellOffset()
+        public sealed override ulong CalculateMemCellOffset()
         {
             GuardValidity();
 
@@ -19,6 +18,11 @@ namespace Solar.Asm.Engine.Model.Code
                 return 0;
 
             return PreviousChunk.Ref!.CalculateMemCellOffset() + PreviousChunk.Ref!.CalculateMemSize();
+        }
+
+        public sealed override ulong CalculateMemCellVirtualAddress()
+        {
+            return Fragment!.Ref!.CalculateMemCellVirtualAddress() + CalculateMemCellOffset();
         }
     }
 }
