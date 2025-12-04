@@ -5,8 +5,6 @@ namespace Solar.Asm.Engine.Model.Exceptions
 {
     public class SmlaExpressionHasNoValueException : SmlaExpressionException
     {
-        public readonly ExpressionBase? Expression;
-
         public SmlaExpressionHasNoValueException()
         {
         }
@@ -19,14 +17,12 @@ namespace Solar.Asm.Engine.Model.Exceptions
         {
         }
 
-        public SmlaExpressionHasNoValueException(string message, ExpressionBase expression) : this(message)
+        public SmlaExpressionHasNoValueException(string message, ExpressionBase expression) : base(message, expression)
         {
-            Expression = expression;
         }
 
-        public SmlaExpressionHasNoValueException(string message, ExpressionBase expression, Exception inner) : this(message, inner)
+        public SmlaExpressionHasNoValueException(string message, ExpressionBase expression, Exception inner) : base(message, expression, inner)
         {
-            Expression = expression;
         }
     }
 }
