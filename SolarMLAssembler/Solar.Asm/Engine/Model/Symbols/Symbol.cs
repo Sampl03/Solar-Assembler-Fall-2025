@@ -84,6 +84,11 @@ namespace Solar.Asm.Engine.Model.Symbols
         /// </summary>
         public ulong MemCellOffset { get; set; } = 0;
 
+        /// <returns>
+        /// The value of this symbol. If the symbol is undefined, this returns  <see langword="0L"/>
+        /// </returns>
+        /// <exception cref="SmlaInvalidSymbolException"></exception>
+        public ulong GetValue()
         {
             GuardValidity();
 
@@ -91,10 +96,17 @@ namespace Solar.Asm.Engine.Model.Symbols
 
             return Target switch
             {
-                SymbolTarget.ABSOLUTE => AbsoluteValue,
-                SymbolTarget.SECTION => TargetSection?.Ref!.CalculateMemCellVirtualAddress() ?? throw new SmlaInvalidSymbolException("Tried getting value of section symbol with null target section", this),
-                SymbolTarget.LABEL => (TargetChunk?.Ref!.CalculateMemCellVirtualAddress() ?? throw new SmlaInvalidSymbolException("Tried getting value of label symbol with null target chunk", this)) + MemCellOffset,
-                SymbolTarget.UNDEFINED => 0L, // Undefined symbols default to 0
+                SymbolTarget.ABSOLUTE
+                    => AbsoluteValue,
+                SymbolTarget.SECTION
+                    => TargetSection?.Ref!.CalculateMemCellVirtualAddress() ??
+                        throw new SmlaInvalidSymbolException("Tried getting value of section symbol with null target section", this),
+                SymbolTarget.LABEL
+                    => (TargetChunk?.Ref!.CalculateMemCellVirtualAddress() + MemCellOffset) ?? 
+                        throw new SmlaInvalidSymbolException("Tried getting value of label symbol with null target chunk", this),
+                SymbolTarget.UNDEFINED
+                    => 0L, // Undefined symbols default to 0
+
                 _ => throw new SmlaInvalidSymbolException("Tried getting value of symbol with invalid target type", this),
             };
         }
