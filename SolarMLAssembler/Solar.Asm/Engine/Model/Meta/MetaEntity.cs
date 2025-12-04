@@ -5,7 +5,7 @@ namespace Solar.Asm.Engine.Model.Meta
     public abstract class MetaEntity : ModelEntity
     {
         /// <summary>
-        /// The Program in which this symbol was declared
+        /// The Program in which this meta entity was declared
         /// </summary>
         public Program OwningProgram
         {

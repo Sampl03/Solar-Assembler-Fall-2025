@@ -8,7 +8,7 @@ namespace Solar.Asm.Engine.Model.Code
     public abstract class CodeEntity : ModelEntity
     {
         /// <summary>
-        /// The Program in which this symbol was declared
+        /// The Program in which this code entity was declared
         /// </summary>
         public Program OwningProgram
         {

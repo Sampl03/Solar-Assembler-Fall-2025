@@ -97,9 +97,6 @@ namespace Solar.EntitySystem.Behavior
             if (template.State != EntityState.Uninitialised)
                 throw new EntityTemplateInitialisedException("Cannot used a non-Unitialised entity as a template for the Make function.");
 
-            // Cache the hash for the template
-            var templateHash = template.EntityHash();
-
             // Search for equivalent entities
             var otherEntity = owningTable.FindEquivalentEntity(template);
 
