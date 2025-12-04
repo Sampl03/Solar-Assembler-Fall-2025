@@ -35,7 +35,7 @@ namespace Solar.Asm.Engine.Model
             CodeEntities    = new(this, typeof(CodeEntity)   );
             Meta            = new(this, typeof(MetaEntity)   );
             Symbols         = new(this, typeof(Symbol)       );
-            Expressions     = new(this, typeof(Expression<>) );
+            Expressions     = new(this, typeof(ExpressionBase) );
         }
 
         public abstract Section CreateOrGetSection();
@@ -46,8 +46,8 @@ namespace Solar.Asm.Engine.Model
 
         public virtual bool CanMergeInto(IMergeable destination)
         {
-            // Can't merge into a non-program
-            if (destination is not Program)
+            // The two programs must be of the same type (they should come from the same OutputFormatter)
+            if (GetType() != destination.GetType())
                 return false;
 
             // Recast for ease of use
