@@ -47,7 +47,7 @@ namespace Solar.Asm.Engine.Model.Expressions
             return newExpr;
         }
 
-        public override ExpressionResult<TReturn> Evaluate(Program context, bool resultIsNecessary = false)
+        public override ExpressionResult<TReturn> Evaluate(Program context)
         {
             return new() { HasValue = true, Value = Value };
         }

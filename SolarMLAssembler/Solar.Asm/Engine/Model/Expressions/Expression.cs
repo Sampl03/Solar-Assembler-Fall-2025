@@ -39,17 +39,12 @@ namespace Solar.Asm.Engine.Model.Expressions
         /// <summary>
         /// Calculates the value of this expression, returning an <see cref="ExpressionResult{TReturn}"/>
         /// </summary>
-        /// <remarks>
-        /// If <paramref name="resultIsNecessary"/> is <see langword="true"/> and this expression does not return a value,
-        /// throws an <see cref="SmlaExpressionHasNoValueException"/>
-        /// </remarks>
         /// <param name="context">The <see cref="Program"/> this expression is to be evaluated within</param>
-        /// <param name="resultIsNecessary">If <see langword="true"/>, an expression which does not return a result will throw an exception</param>
         /// <returns>
         /// An <see cref="ExpressionResult{TReturn}"/> containing the result of the evaluation if there was one
         /// </returns>
         /// <exception cref="SmlaExpressionHasNoValueException"></exception>
-        public abstract ExpressionResult<TReturn> Evaluate(Program context, bool resultIsNecessary = false);
+        public abstract ExpressionResult<TReturn> Evaluate(Program context);
 
         /// <summary>
         /// Simplifies this expression as much as possible
