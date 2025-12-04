@@ -77,7 +77,7 @@ namespace Solar.EntitySystem
         /// Can be overriden by derived classes to add validation behaviour.
         /// </summary>
         /// <returns>
-        /// If <paramref name="throwIfInvalid"/> is <see langword="false"/>, this method returns whether or not the entity is in a usable state<br/>
+        /// Whether or not the entity is in a usable state<br/>
         /// </returns>
         protected virtual bool OnValidityGuard() => true;
 
@@ -133,6 +133,10 @@ namespace Solar.EntitySystem
             return true;
         }
 
+        /// <summary>
+        /// Hook method called by <seealso cref="Invalidate()"/>.<br/>
+        /// Can be overriden by derived classes to add validation behaviour.
+        /// </summary>
         protected virtual void OnInvalidated() { }
     }
 }
