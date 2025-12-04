@@ -31,8 +31,8 @@ namespace Solar.Asm.Engine.Model.Expressions
     /// <summary>
     /// Parent class for all expressions that return a value of type <typeparamref name="TReturn"/>
     /// </summary>
-    /// <typeparam name="TReturn">The return type of this expression</typeparam>
-    public abstract class Expression<TReturn> : ExpressionBase
+    /// <typeparam name="TReturn">The return type of this expression, which must be equatable</typeparam>
+    public abstract class Expression<TReturn> : ExpressionBase where TReturn : IEquatable<TReturn>
     {
         public sealed override Type ReturnType => typeof(TReturn);
 

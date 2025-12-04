@@ -12,7 +12,7 @@ namespace Solar.Asm.Engine.Model.Expressions
     /// <typeparam name="TReturn"></typeparam>
     public sealed class LiteralExpr<TReturn>
         : Expression<TReturn>, IIrreplaceableEntity, IUniqueEntity
-        where TReturn : IConvertible, IEquatable<TReturn>
+        where TReturn : IEquatable<TReturn>
     {
         public override bool IsConstantExpression => true;
 
