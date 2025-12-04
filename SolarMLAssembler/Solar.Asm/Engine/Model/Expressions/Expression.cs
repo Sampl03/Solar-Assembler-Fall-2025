@@ -37,19 +37,24 @@ namespace Solar.Asm.Engine.Model.Expressions
         public sealed override Type ReturnType => typeof(TReturn);
 
         /// <summary>
-        /// Calculates the value of this expression, returning an <see cref="ExpressionResult{TReturn}"/>
+        /// Calculates the value of this expression within its own context, returning an <see cref="ExpressionResult{TReturn}"/>
         /// </summary>
-        /// <param name="context">The <see cref="Program"/> this expression is to be evaluated within</param>
+        /// <remarks>
+        /// If an expression in this tree requires a result but could not get one, this method may throw a <see cref="SmlaExpressionHasNoValueException"/>
+        /// </remarks>
         /// <returns>
         /// An <see cref="ExpressionResult{TReturn}"/> containing the result of the evaluation if there was one
         /// </returns>
         /// <exception cref="SmlaExpressionHasNoValueException"></exception>
-        public abstract ExpressionResult<TReturn> Evaluate(Program context);
+        public abstract ExpressionResult<TReturn> Evaluate();
 
         /// <summary>
         /// Simplifies this expression as much as possible
         /// </summary>
-        /// <param name="context">The <see cref="Program"/> this expression is to be simplified within</param>
-        public abstract void Simplify(Program context);
+        /// <remarks>
+        /// If an expression in this tree reported itself as constant but its value could not be determined, this method may throw a <see cref="SmlaExpressionHasNoValueException"/>"/>
+        /// </remarks>
+        /// <exception cref="SmlaExpressionHasNoValueException"></exception>
+        public abstract void Simplify();
     }
 }

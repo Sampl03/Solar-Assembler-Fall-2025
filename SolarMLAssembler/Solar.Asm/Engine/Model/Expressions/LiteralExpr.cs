@@ -12,7 +12,7 @@ namespace Solar.Asm.Engine.Model.Expressions
     /// <typeparam name="TReturn"></typeparam>
     public sealed class LiteralExpr<TReturn>
         : Expression<TReturn>, IIrreplaceableEntity, IUniqueEntity
-        where TReturn : struct, IConvertible, IEquatable<TReturn>
+        where TReturn : IConvertible, IEquatable<TReturn>
     {
         public override bool IsConstantExpression => true;
 
@@ -47,12 +47,12 @@ namespace Solar.Asm.Engine.Model.Expressions
             return newExpr;
         }
 
-        public override ExpressionResult<TReturn> Evaluate(Program context)
+        public override ExpressionResult<TReturn> Evaluate()
         {
             return new() { HasValue = true, Value = Value };
         }
 
-        public override void Simplify(Program context)
+        public override void Simplify()
         {
             // Already simplified
             return;
