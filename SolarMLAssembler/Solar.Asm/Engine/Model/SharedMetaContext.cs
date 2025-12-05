@@ -1,4 +1,4 @@
-﻿using Solar.Asm.Engine.Model.Meta.IO;
+﻿using Solar.Asm.Engine.Model.IO;
 using Solar.Asm.Engine.Model.Meta;
 using Solar.EntitySystem;
 

@@ -1,7 +1,7 @@
 ﻿using Solar.Asm.Engine.Model.Code;
 using Solar.Asm.Engine.Model.Symbols;
 
-namespace Solar.Asm.Engine.Model.Meta.IO
+namespace Solar.Asm.Engine.Model.IO
 {
     public abstract class OutputFormatter
     {

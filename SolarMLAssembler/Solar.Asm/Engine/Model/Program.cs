@@ -4,9 +4,9 @@ using Solar.EntitySystem.Exceptions;
 
 using Solar.Asm.Engine.Model.Code;
 using Solar.Asm.Engine.Model.Meta;
-using Solar.Asm.Engine.Model.Meta.IO;
 using Solar.Asm.Engine.Model.Symbols;
 using Solar.Asm.Engine.Model.Expressions;
+using Solar.Asm.Engine.Model.IO;
 
 namespace Solar.Asm.Engine.Model
 {

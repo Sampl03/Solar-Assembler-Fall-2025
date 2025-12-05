@@ -1,4 +1,4 @@
-﻿namespace Solar.Asm.Engine.Model.Meta.IO
+﻿namespace Solar.Asm.Engine.Model.IO
 {
     public enum Endianness { BigEndian, LittleEndian }
 

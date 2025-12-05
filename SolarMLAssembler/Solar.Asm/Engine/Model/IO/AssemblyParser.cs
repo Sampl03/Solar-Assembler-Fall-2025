@@ -1,6 +1,6 @@
 ﻿using Solar.Asm.Engine.Model.Code;
 
-namespace Solar.Asm.Engine.Model.Meta.IO
+namespace Solar.Asm.Engine.Model.IO
 {
     /// <summary>
     /// Handles the translation and patching of assembly source and assembled code specific to an architecture
