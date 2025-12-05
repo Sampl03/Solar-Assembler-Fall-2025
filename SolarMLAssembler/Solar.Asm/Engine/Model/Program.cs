@@ -19,21 +19,20 @@ namespace Solar.Asm.Engine.Model
     /// </remarks>
     public abstract class Program : IContext, IMergeable
     {
-        public ArchitectureSpecs ArchSpecs { get => AssemblyDialect.ArchSpecs; }
+        public ArchitectureSpecs ArchSpecs { get => SharedMeta.AssemblyDialect.ArchSpecs; }
 
-        public required OutputFormatter Outputter { get; init; }
+        public required SharedMetaContext SharedMeta { get; init; }
         public required InputReader Inputter { get; init; }
-        public required AssemblyParser AssemblyDialect { get; init; }
 
         public EntityManager CodeEntities { get; init; }
-        public EntityManager Meta { get; init; }
         public EntityManager Symbols { get; init; }
         public EntityManager Expressions { get; init; }
 
-        public Program()
+        public Program(in SharedMetaContext sharedMeta, InputReader inputter)
         {
+            SharedMeta      = sharedMeta;
+            Inputter        = inputter;
             CodeEntities    = new(this, typeof(CodeEntity)   );
-            Meta            = new(this, typeof(MetaEntity)   );
             Symbols         = new(this, typeof(Symbol)       );
             Expressions     = new(this, typeof(ExpressionBase) );
         }
@@ -60,8 +59,6 @@ namespace Solar.Asm.Engine.Model
             // Managers must be able to merge
             if (!CodeEntities.CanMergeInto(destProgram.CodeEntities))
                 return false;
-            if (!Meta.CanMergeInto(destProgram.Meta))
-                return false;
             if (!Symbols.CanMergeInto(destProgram.Symbols))
                 return false;
             if (!Expressions.CanMergeInto(destProgram.Expressions))
@@ -80,7 +77,6 @@ namespace Solar.Asm.Engine.Model
 
             // Merge destination program's managers into ours
             CodeEntities.MergeInto(destProgram.CodeEntities);
-            Meta.MergeInto(destProgram.Meta);
             Symbols.MergeInto(destProgram.Symbols);
             Expressions.MergeInto(destProgram.Expressions);
 
