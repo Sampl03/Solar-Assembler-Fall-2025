@@ -11,6 +11,6 @@ namespace Solar.Asm.Engine.Model.IO
 
         public abstract Chunk ParseInstruction(Program context, string source);
 
-        public abstract byte[] PatchBytes(byte[] data, ChunkPatchRecord[] patches);
+        public abstract byte[] PatchBytes(byte[] data, ChunkPatch[] patches);
     }
 }

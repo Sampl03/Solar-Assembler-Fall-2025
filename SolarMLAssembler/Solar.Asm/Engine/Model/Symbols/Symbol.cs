@@ -261,7 +261,7 @@ namespace Solar.Asm.Engine.Model.Symbols
                     destSymbol.MemCellOffset = MemCellOffset;
                     break;
                 case SymbolMergeBehaviour.PLUGIN_DEPENDENT:
-                    destSymbol.OwningProgram.Outputter.MergeSymbols(this, destSymbol); // CanMergeInto already checked validity
+                    destSymbol.OwningProgram.SharedMeta.Outputter.MergeSymbols(this, destSymbol); // CanMergeInto already checked validity
                     return;
                 default:
                     throw new SmlaInvalidSymbolException("Invalid symbol state during merge", this);
@@ -297,7 +297,7 @@ namespace Solar.Asm.Engine.Model.Symbols
                     return true;
 
                 case SymbolMergeBehaviour.PLUGIN_DEPENDENT:
-                    return OwningProgram.Outputter.AreSymbolsEquivalent(this, otherSymbol);
+                    return OwningProgram.SharedMeta.Outputter.AreSymbolsEquivalent(this, otherSymbol);
             }
 
             throw new SmlaInvalidSymbolException("Invalid merge behaviour from symbol", this);
