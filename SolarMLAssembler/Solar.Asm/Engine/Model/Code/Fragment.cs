@@ -244,6 +244,28 @@ namespace Solar.Asm.Engine.Model.Code
             return _cachedBytes;
         }
 
+        public override BinaryPatch[] EmitPatches()
+        {
+            GuardValidity();
+
+            var patches = new List<BinaryPatch>();
+
+            foreach (Chunk chunk in _chunkHandles.Select(fh => fh.Ref!))
+            {
+                var chunkPatches = chunk.EmitPatches();
+
+                // Adjust the cell offsets of each patch to account for the chunk's position within the fragment
+                ulong chunkOffset = chunk.CalculateMemCellOffset();
+                for (int i = 0; i < chunkPatches.Length; i++)
+                    chunkPatches[i].CellOffset += chunkOffset;
+
+                // Append the chunk's updated patches to the fragments's patches
+                patches.AddRange(chunkPatches);
+            }
+
+            return [.. patches];
+        }
+
         public override ulong CalculateMemCellOffset()
         {
             GuardValidity();

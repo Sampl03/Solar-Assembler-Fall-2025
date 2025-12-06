@@ -268,7 +268,7 @@ namespace Solar.Asm.Engine.Model.Code
             _stateChanged = false;
         }
 
-        private readonly List<byte> _cachedBytes = [];
+        protected readonly List<byte> _cachedBytes = [];
         public override IReadOnlyList<byte> EmitBytes()
         {
             GuardValidity();
@@ -292,6 +292,30 @@ namespace Solar.Asm.Engine.Model.Code
 
             _cachedBytes.TrimExcess();
             return _cachedBytes;
+        }
+
+        public override BinaryPatch[] EmitPatches()
+        {
+            GuardValidity();
+
+            var patches = new List<BinaryPatch>();
+
+            foreach (Fragment frag in _fragmentHandles.Select(fh => fh.Ref!))
+            {
+                var fragPatches = frag.EmitPatches();
+
+                // Adjust the cell offsets of each patch to account for the fragment's position within the section
+                ulong fragOffset = frag.CalculateMemCellOffset();
+                for (int i = 0; i < fragPatches.Length; i++)
+                {
+                    fragPatches[i].CellOffset += fragOffset;
+                }
+
+                // Append the fragment's patches to the section's patches
+                patches.AddRange(fragPatches);
+            }
+
+            return [.. patches];
         }
 
         public override ulong CalculateMemCellOffset()

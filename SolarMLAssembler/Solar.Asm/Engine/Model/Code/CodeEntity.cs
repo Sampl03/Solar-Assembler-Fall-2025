@@ -36,6 +36,11 @@ namespace Solar.Asm.Engine.Model.Code
         public abstract IReadOnlyList<byte> EmitBytes();
 
         /// <returns>
+        /// The binary patches emitted by this entity
+        /// </returns>
+        public abstract BinaryPatch[] EmitPatches();
+
+        /// <returns>
         /// The number of emitted memory cells.<br/>
         /// Note that this value is not necessarily in bytes, but in memory cells defined by the architecture
         /// </returns>

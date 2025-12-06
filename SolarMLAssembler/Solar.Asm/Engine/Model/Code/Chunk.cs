@@ -10,6 +10,10 @@ namespace Solar.Asm.Engine.Model.Code
 
         protected Chunk() : base() { }
 
+        public abstract override IReadOnlyList<byte> EmitBytes();
+
+        public abstract override BinaryPatch[] EmitPatches();
+
         public sealed override ulong CalculateMemCellOffset()
         {
             GuardValidity();
