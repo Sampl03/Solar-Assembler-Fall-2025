@@ -19,14 +19,17 @@ namespace Solar.Asm.Engine.Model.Expressions
         where TResult : IEquatable<TResult>
     {
         public override bool IsConstantExpression =>
-            Expr1.Ref!.IsConstantExpression && 
-            Expr2.Ref!.IsConstantExpression &&
-            Expr3.Ref!.IsConstantExpression;
+            Expr1.IsConstantExpression && 
+            Expr2.IsConstantExpression &&
+            Expr3.IsConstantExpression;
 
         public readonly Func<T1, T2, T3, TResult> OperatorFunc;
-        public readonly EntityHandle<Expression<T1>> Expr1;
-        public readonly EntityHandle<Expression<T2>> Expr2;
-        public readonly EntityHandle<Expression<T3>> Expr3;
+        private readonly EntityHandle<Expression<T1>> _expr1;
+        private readonly EntityHandle<Expression<T2>> _expr2;
+        private readonly EntityHandle<Expression<T3>> _expr3;
+        public Expression<T1> Expr1 => _expr1.Ref!;
+        public Expression<T2> Expr2 => _expr2.Ref!;
+        public Expression<T3> Expr3 => _expr3.Ref!;
 
         // Private constructor to enforce use of From factory method
         private TernaryExpr(
@@ -35,9 +38,9 @@ namespace Solar.Asm.Engine.Model.Expressions
             Expression<T3> expression3,
             Func<T1, T2, T3, TResult> operatorFunction)
         {
-            Expr1 = expression1.GetHandle();
-            Expr2 = expression2.GetHandle();
-            Expr3 = expression3.GetHandle();
+            _expr1 = expression1.GetHandle();
+            _expr2 = expression2.GetHandle();
+            _expr3 = expression3.GetHandle();
             OperatorFunc = operatorFunction;
         }
 
@@ -56,6 +59,9 @@ namespace Solar.Asm.Engine.Model.Expressions
             Expression<T3> expression3, 
             Func<T1, T2, T3, TResult> operatorFunction)
         {
+            expression1.GuardValidity();
+            expression2.GuardValidity();
+            expression3.GuardValidity();
             TernaryExpr<T1, T2, T3, TResult> newExpr = new(expression1, expression2, expression3, operatorFunction);
             newExpr.Initialise(context.Expressions);
             return newExpr;
@@ -65,14 +71,14 @@ namespace Solar.Asm.Engine.Model.Expressions
         {
             GuardValidity();
 
-            ExpressionResult<T1> result1 = Expr1.Ref!.Evaluate();
-            ExpressionResult<T2> result2 = Expr2.Ref!.Evaluate();
-            ExpressionResult<T3> result3 = Expr3.Ref!.Evaluate();
+            ExpressionResult<T1> result1 = Expr1.Evaluate();
+            ExpressionResult<T2> result2 = Expr2.Evaluate();
+            ExpressionResult<T3> result3 = Expr3.Evaluate();
 
             if (!result1.HasValue || !result2.HasValue || !result3.HasValue)
                 return new ExpressionResult<TResult> { HasValue = false };
 
-            return new ExpressionResult<TResult>
+            return new()
             {
                 HasValue = true,
                 Value = OperatorFunc(result1.Value, result2.Value, result3.Value)
@@ -83,17 +89,17 @@ namespace Solar.Asm.Engine.Model.Expressions
         {
             GuardValidity();
 
-            Expr1.Ref!.Simplify();
-            Expr2.Ref!.Simplify();
-            Expr3.Ref!.Simplify();
+            Expr1.Simplify();
+            Expr2.Simplify();
+            Expr3.Simplify();
 
             // If the source expression is not constant, we cannot simplify
-            if (!Expr1.Ref!.IsConstantExpression || !Expr2.Ref!.IsConstantExpression || !Expr3.Ref!.IsConstantExpression)
+            if (!Expr1.IsConstantExpression || !Expr2.IsConstantExpression || !Expr3.IsConstantExpression)
                 return;
 
-            ExpressionResult<T1> result1 = Expr1.Ref!.Evaluate();
-            ExpressionResult<T2> result2 = Expr2.Ref!.Evaluate();
-            ExpressionResult<T3> result3 = Expr3.Ref!.Evaluate();
+            ExpressionResult<T1> result1 = Expr1.Evaluate();
+            ExpressionResult<T2> result2 = Expr2.Evaluate();
+            ExpressionResult<T3> result3 = Expr3.Evaluate();
 
             if (!result1.HasValue || !result2.HasValue || !result3.HasValue)
                 throw new SmlaExpressionHasNoValueException("Could not simplify ternary expression because one or more constant operand has no value.", this);
@@ -109,9 +115,9 @@ namespace Solar.Asm.Engine.Model.Expressions
 
         protected override void OnInvalidated()
         {
-            Expr1.Dispose();
-            Expr2.Dispose();
-            Expr3.Dispose();
+            _expr1.Dispose();
+            _expr2.Dispose();
+            _expr3.Dispose();
         }
     }
 }

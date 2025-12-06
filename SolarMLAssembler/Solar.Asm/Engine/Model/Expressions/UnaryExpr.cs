@@ -13,15 +13,16 @@ namespace Solar.Asm.Engine.Model.Expressions
         where TOperand : IEquatable<TOperand>
         where TResult : IEquatable<TResult>
     {
-        public override bool IsConstantExpression => OperandExpression.Ref!.IsConstantExpression;
+        public override bool IsConstantExpression => OperandExpression.IsConstantExpression;
 
         public readonly Func<TOperand, TResult> OperatorFunc;
-        public readonly EntityHandle<Expression<TOperand>> OperandExpression;
+        private readonly EntityHandle<Expression<TOperand>> _operandExpression;
+        public Expression<TOperand> OperandExpression => _operandExpression.Ref!;
 
         // Private constructor to enforce use of From factory method
         private UnaryExpr(Expression<TOperand> operandExpression, Func<TOperand, TResult> castFunction)
         {
-            OperandExpression = operandExpression.GetHandle();
+            _operandExpression = operandExpression.GetHandle();
             OperatorFunc = castFunction;
         }
 
@@ -33,6 +34,7 @@ namespace Solar.Asm.Engine.Model.Expressions
         /// <param name="operatorFunction">The unary operator function to use</param>
         public static UnaryExpr<TOperand, TResult> From(Program context, Expression<TOperand> operandExpression, Func<TOperand, TResult> operatorFunction)
         {
+            operandExpression.GuardValidity();
             UnaryExpr<TOperand, TResult> newExpr = new(operandExpression, operatorFunction);
             newExpr.Initialise(context.Expressions);
             return newExpr;
@@ -42,12 +44,12 @@ namespace Solar.Asm.Engine.Model.Expressions
         {
             GuardValidity();
 
-            ExpressionResult<TOperand> operandResult = OperandExpression.Ref!.Evaluate();
+            ExpressionResult<TOperand> operandResult = OperandExpression.Evaluate();
 
             if (!operandResult.HasValue)
-                return new ExpressionResult<TResult> { HasValue = false };
+                return new() { HasValue = false };
 
-            return new ExpressionResult<TResult>
+            return new()
             {
                 HasValue = true,
                 Value = OperatorFunc(operandResult.Value!)
@@ -58,13 +60,13 @@ namespace Solar.Asm.Engine.Model.Expressions
         {
             GuardValidity();
 
-            OperandExpression.Ref!.Simplify();
+            OperandExpression.Simplify();
 
             // If the operand expression is not constant, we cannot simplify
-            if (!OperandExpression.Ref!.IsConstantExpression)
+            if (!OperandExpression.IsConstantExpression)
                 return;
 
-            ExpressionResult<TOperand> operandResult = OperandExpression.Ref!.Evaluate();
+            ExpressionResult<TOperand> operandResult = OperandExpression.Evaluate();
 
             if (!operandResult.HasValue)
                 throw new SmlaExpressionHasNoValueException("Could not simplify unary expression because constant operand expression has no value.", this);
@@ -80,7 +82,7 @@ namespace Solar.Asm.Engine.Model.Expressions
 
         protected override void OnInvalidated()
         {
-            OperandExpression.Dispose();
+            _operandExpression.Dispose();
         }
     }
 }

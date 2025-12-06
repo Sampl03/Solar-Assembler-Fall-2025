@@ -16,17 +16,20 @@ namespace Solar.Asm.Engine.Model.Expressions
         where TRight : IEquatable<TRight>
         where TResult : IEquatable<TResult>
     {
-        public override bool IsConstantExpression => LeftExpression.Ref!.IsConstantExpression && RightExpression.Ref!.IsConstantExpression;
+        public override bool IsConstantExpression => LeftExpression.IsConstantExpression && RightExpression.IsConstantExpression;
 
         public readonly Func<TLeft, TRight, TResult> OperatorFunc;
-        public readonly EntityHandle<Expression<TLeft>> LeftExpression;
-        public readonly EntityHandle<Expression<TRight>> RightExpression;
+        private readonly EntityHandle<Expression<TLeft>> _leftExpr;
+        private readonly EntityHandle<Expression<TRight>> _rightExpr;
+        public Expression<TLeft> LeftExpression => _leftExpr.Ref!;
+        public Expression<TRight> RightExpression => _rightExpr.Ref!;
+
 
         // Private constructor to enforce use of From factory method
         private BinaryExpr(Expression<TLeft> leftExpression, Expression<TRight> rightExpression, Func<TLeft, TRight, TResult> operatorFunction)
         {
-            LeftExpression = leftExpression.GetHandle();
-            RightExpression = rightExpression.GetHandle();
+            _leftExpr = leftExpression.GetHandle();
+            _rightExpr = rightExpression.GetHandle();
             OperatorFunc = operatorFunction;
         }
 
@@ -43,6 +46,8 @@ namespace Solar.Asm.Engine.Model.Expressions
             Expression<TRight> rightExpression,
             Func<TLeft, TRight, TResult> operatorFunction)
         {
+            leftExpression.GuardValidity();
+            rightExpression.GuardValidity();
             BinaryExpr<TLeft, TRight, TResult> newExpr = new(leftExpression, rightExpression, operatorFunction);
             newExpr.Initialise(context.Expressions);
             return newExpr;
@@ -52,13 +57,13 @@ namespace Solar.Asm.Engine.Model.Expressions
         {
             GuardValidity();
 
-            ExpressionResult<TLeft> leftResult = LeftExpression.Ref!.Evaluate();
-            ExpressionResult<TRight> rightResult = RightExpression.Ref!.Evaluate();
+            ExpressionResult<TLeft> leftResult = LeftExpression.Evaluate();
+            ExpressionResult<TRight> rightResult = RightExpression.Evaluate();
 
             if (!leftResult.HasValue || !rightResult.HasValue)
-                return new ExpressionResult<TResult> { HasValue = false };
+                return new() { HasValue = false };
 
-            return new ExpressionResult<TResult>
+            return new()
             {
                 HasValue = true,
                 Value = OperatorFunc(leftResult.Value!, rightResult.Value!)
@@ -69,15 +74,15 @@ namespace Solar.Asm.Engine.Model.Expressions
         {
             GuardValidity();
 
-            LeftExpression.Ref!.Simplify();
-            RightExpression.Ref!.Simplify();
+            LeftExpression.Simplify();
+            RightExpression.Simplify();
 
             // If the source expression is not constant, we cannot simplify
-            if (!LeftExpression.Ref!.IsConstantExpression || !RightExpression.Ref!.IsConstantExpression)
+            if (!LeftExpression.IsConstantExpression || !RightExpression.IsConstantExpression)
                 return;
 
-            ExpressionResult<TLeft> leftResult = LeftExpression.Ref!.Evaluate();
-            ExpressionResult<TRight> rightResult = RightExpression.Ref!.Evaluate();
+            ExpressionResult<TLeft> leftResult = LeftExpression.Evaluate();
+            ExpressionResult<TRight> rightResult = RightExpression.Evaluate();
 
             if (!leftResult.HasValue || !rightResult.HasValue)
                 throw new SmlaExpressionHasNoValueException("Could not simplify binary expression because one or more constant operand has no value.", this);
@@ -93,8 +98,8 @@ namespace Solar.Asm.Engine.Model.Expressions
 
         protected override void OnInvalidated()
         {
-            LeftExpression.Dispose();
-            RightExpression.Dispose();
+            _leftExpr.Dispose();
+            _rightExpr.Dispose();
         }
     }
 }
