@@ -13,13 +13,14 @@ namespace Solar.Asm.Engine.Model.Code
     /// </remarks>
     public sealed class Fragment : CodeEntity
     {
-        private readonly IList<EntityHandle<Chunk>> _chunkHandles = [];
-
-        public IReadOnlyList<EntityHandle<Chunk>> Chunks { get => _chunkHandles.AsReadOnly(); }
+        private readonly List<EntityHandle<Chunk>> _chunkHandles = [];
+        public IEnumerable<Chunk> Chunks => _chunkHandles.Select(ch => ch.Ref!);
 
         // Section and PreviousFragment should only be set by the containing Section.
-        public EntityHandle<Section>? Section { get; internal set; }
-        public EntityHandle<Fragment>? PreviousFragment { get; internal set; }
+        internal EntityHandle<Section>? _section;
+        internal EntityHandle<Fragment>? _prevFragment;
+        public Section? Section => _section?.Ref;
+        public Fragment? PreviousFragment => _prevFragment?.Ref;
 
         public Fragment() : base()
         {
@@ -48,7 +49,7 @@ namespace Solar.Asm.Engine.Model.Code
             if (chunk.Fragment is not null)
                 throw new SmlaCannotAddException("Fragment could not add Chunk which already belongs to another section");
 
-            if (_chunkHandles.Where(ch => ch.Ref == chunk).Any()) // Ensure uniqueness
+            if (_chunkHandles.Where(ch => ReferenceEquals(ch.Ref, chunk)).Any()) // Ensure uniqueness
                 throw new SmlaCannotAddException("Fragment could not add Chunk which already belongs to it");
 
             // Insert Chunk at the specified location
@@ -56,7 +57,7 @@ namespace Solar.Asm.Engine.Model.Code
                 _chunkHandles.Add(chunk.GetHandle());
             else
                 _chunkHandles.Insert(i, chunk.GetHandle());
-            chunk.Fragment = this.GetHandle();
+            chunk._fragment = this.GetHandle();
 
             /* Update the links */
             EntityHandle<Chunk>?
@@ -66,8 +67,8 @@ namespace Solar.Asm.Engine.Model.Code
             // If there's a next handle, we need to point it to the new chunk and borrow its prev handle
             if (nextChunkHandle is not null)
             {
-                prevChunkHandle = nextChunkHandle.Ref!.PreviousChunk;
-                nextChunkHandle.Ref!.PreviousChunk = chunk.GetHandle();
+                prevChunkHandle = nextChunkHandle.Ref!._prevChunk;
+                nextChunkHandle.Ref!._prevChunk = chunk.GetHandle();
             }
             // Otherwise we need to create our own prev handle
             else
@@ -76,8 +77,8 @@ namespace Solar.Asm.Engine.Model.Code
             }
 
             // Assign prevChunkHandle to the new chunk
-            chunk.PreviousChunk?.Dispose(); // Dispose of any previous chunk reference if it exists
-            chunk.PreviousChunk = prevChunkHandle;
+            chunk._prevChunk?.Dispose(); // Dispose of any previous chunk reference if it exists
+            chunk._prevChunk = prevChunkHandle;
 
             // Ensure the chunk is now valid
             chunk.GuardValidity();
@@ -110,9 +111,9 @@ namespace Solar.Asm.Engine.Model.Code
             // If there's a next node, we need to update its prev reference
             if (nextChunkHandle is not null)
             {
-                nextChunkHandle.Ref!.PreviousChunk!.Dispose();
-                nextChunkHandle.Ref!.PreviousChunk = chunk.PreviousChunk;
-                chunk.PreviousChunk = null;
+                nextChunkHandle.Ref!._prevChunk!.Dispose();
+                nextChunkHandle.Ref!._prevChunk = chunk._prevChunk;
+                chunk._prevChunk = null;
             }
 
             // Remove the chunk
@@ -120,12 +121,12 @@ namespace Solar.Asm.Engine.Model.Code
             _chunkHandles.RemoveAt(chunkId);
 
             // Remove its reference to the parent fragment
-            chunkHandle.Ref!.Fragment!.Dispose();
-            chunkHandle.Ref!.Fragment = null;
+            chunkHandle.Ref!._fragment!.Dispose();
+            chunkHandle.Ref!._fragment = null;
 
             // Remove its reference to the previous chunk if not already transferred to the next
-            chunkHandle.Ref!.PreviousChunk?.Dispose();
-            chunkHandle.Ref!.PreviousChunk = null;
+            chunkHandle.Ref!._prevChunk?.Dispose();
+            chunkHandle.Ref!._prevChunk = null;
 
             // Dispose of the fragment's handle
             chunkHandle.Dispose();
@@ -154,11 +155,11 @@ namespace Solar.Asm.Engine.Model.Code
             chunk.GuardValidity();
 
             // Get the handle that corresponds, if it exists
-            var fragHandle = _chunkHandles.Where(fh => fh.Ref == chunk).SingleOrDefault();
-            if (fragHandle is null)
+            var chunkHandle = _chunkHandles.Where(ch => ReferenceEquals(ch.Ref, chunk)).SingleOrDefault();
+            if (chunkHandle is null)
                 return -1;
 
-            return _chunkHandles.IndexOf(fragHandle);
+            return _chunkHandles.IndexOf(chunkHandle);
         }
 
 
@@ -180,11 +181,11 @@ namespace Solar.Asm.Engine.Model.Code
                 Chunk chunk = _chunkHandles[i].Ref!;
 
                 // Check that PreviousChunk is indeed the correct chunk
-                if (chunk.PreviousChunk!.Ref! != _chunkHandles[i - 1].Ref!)
+                if (chunk.PreviousChunk! != _chunkHandles[i - 1].Ref!)
                     return false;
 
                 // Check that every chunk points to this section
-                if (chunk.Fragment!.Ref! != this)
+                if (chunk.Fragment! != this)
                     return false;
 
             }
@@ -212,7 +213,7 @@ namespace Solar.Asm.Engine.Model.Code
 
             if (!_stateChanged)
             {
-                Section!.Ref!.RequireRecalculation(); // Notify the parent if we didn't already do so before
+                Section!.RequireRecalculation(); // Notify the parent if we didn't already do so before
                 _stateChanged = true;
             }
 
@@ -274,12 +275,26 @@ namespace Solar.Asm.Engine.Model.Code
                 return 0;
 
             // Address of this fragment is the address of the previous segment plus its size
-            return PreviousFragment.Ref!.CalculateMemCellOffset() + PreviousFragment.Ref!.CalculateMemSize();
+            return PreviousFragment!.CalculateMemCellOffset() + PreviousFragment!.CalculateMemSize();
         }
 
         public override ulong CalculateMemCellVirtualAddress()
         {
-            return Section!.Ref!.CalculateMemCellVirtualAddress() + CalculateMemCellOffset();
+            return Section!.CalculateMemCellVirtualAddress() + CalculateMemCellOffset();
+        }
+
+        protected override void OnInvalidated()
+        {
+            _section?.Dispose();
+            _section = null;
+
+            _prevFragment?.Dispose();
+            _prevFragment = null;
+
+            foreach (var chunkHandle in _chunkHandles)
+                chunkHandle.Dispose();
+
+            _chunkHandles.Clear();
         }
     }
 }

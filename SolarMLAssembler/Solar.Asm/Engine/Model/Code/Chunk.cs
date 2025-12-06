@@ -5,8 +5,10 @@ namespace Solar.Asm.Engine.Model.Code
     public abstract class Chunk : CodeEntity
     {
         // Fragment and PreviousChunk should only be set by the containing Fragment.
-        public EntityHandle<Fragment>? Fragment { get; internal set; }
-        public EntityHandle<Chunk>? PreviousChunk { get; internal set; }
+        internal EntityHandle<Fragment>? _fragment;
+        internal EntityHandle<Chunk>? _prevChunk;
+        public Fragment? Fragment => _fragment?.Ref;
+        public Chunk? PreviousChunk => _prevChunk?.Ref;
 
         protected Chunk() : base() { }
 
@@ -21,12 +23,21 @@ namespace Solar.Asm.Engine.Model.Code
             if (PreviousChunk is null)
                 return 0;
 
-            return PreviousChunk.Ref!.CalculateMemCellOffset() + PreviousChunk.Ref!.CalculateMemSize();
+            return PreviousChunk!.CalculateMemCellOffset() + PreviousChunk!.CalculateMemSize();
         }
 
         public sealed override ulong CalculateMemCellVirtualAddress()
         {
-            return Fragment!.Ref!.CalculateMemCellVirtualAddress() + CalculateMemCellOffset();
+            return Fragment!.CalculateMemCellVirtualAddress() + CalculateMemCellOffset();
+        }
+
+        protected override void OnInvalidated()
+        {
+            _fragment?.Dispose();
+            _fragment = null;
+
+            _prevChunk?.Dispose();
+            _prevChunk = null;
         }
     }
 }

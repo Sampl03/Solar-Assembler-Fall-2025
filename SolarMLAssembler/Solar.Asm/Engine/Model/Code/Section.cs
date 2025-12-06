@@ -16,8 +16,8 @@ namespace Solar.Asm.Engine.Model.Code
     /// <param name="flags">The section's flags</param>
     public class Section(string name, SectionFlags flags) : CodeEntity(), IUniqueEntity
     {
-        private readonly IList<EntityHandle<Fragment>> _fragmentHandles = [];
-        public IReadOnlyList<EntityHandle<Fragment>> Fragments { get => _fragmentHandles.AsReadOnly(); }
+        private readonly List<EntityHandle<Fragment>> _fragmentHandles = [];
+        public IEnumerable<Fragment> Fragments => _fragmentHandles.Select(fh => fh.Ref!);
 
         public string Name { get; init; } = name;
 
@@ -52,7 +52,7 @@ namespace Solar.Asm.Engine.Model.Code
             if (fragment.Section is not null)
                 throw new SmlaCannotAddException("Section could not add Fragment which already belongs to another section");
 
-            if (_fragmentHandles.Where(fh => fh.Ref == fragment).Any()) // Ensure uniqueness
+            if (_fragmentHandles.Where(fh => ReferenceEquals(fh.Ref, fragment)).Any()) // Ensure uniqueness
                 throw new SmlaCannotAddException("Section could not add Fragment which already belong to it");
 
             // Insert Fragment at the specified location
@@ -60,7 +60,7 @@ namespace Solar.Asm.Engine.Model.Code
                 _fragmentHandles.Add(fragment.GetHandle());
             else
                 _fragmentHandles.Insert(i, fragment.GetHandle());
-            fragment.Section = this.GetHandle();
+            fragment._section = this.GetHandle();
 
             /* Update the links */
             EntityHandle<Fragment>?
@@ -70,8 +70,8 @@ namespace Solar.Asm.Engine.Model.Code
             // If there's a next handle, we need to point it to new fragment and borrow its prev handle
             if (nextFragmentHandle is not null)
             {
-                prevFragmentHandle = nextFragmentHandle.Ref!.PreviousFragment;
-                nextFragmentHandle.Ref!.PreviousFragment = fragment.GetHandle();
+                prevFragmentHandle = nextFragmentHandle.Ref!._prevFragment;
+                nextFragmentHandle.Ref!._prevFragment = fragment.GetHandle();
             }
             // Otherwise we need to create our own prev handle
             else
@@ -80,7 +80,7 @@ namespace Solar.Asm.Engine.Model.Code
             }
             
             // Assign prevFragmentHandle to the new fragment
-            fragment.PreviousFragment = prevFragmentHandle;
+            fragment._prevFragment = prevFragmentHandle;
 
             // Ensure the fragment is now valid
             fragment.GuardValidity();
@@ -113,9 +113,9 @@ namespace Solar.Asm.Engine.Model.Code
             // If there's a next node, we need to update its prev reference
             if (nextFragmentHandle is not null) 
             {
-                nextFragmentHandle.Ref!.PreviousFragment!.Dispose();
-                nextFragmentHandle.Ref!.PreviousFragment = fragment.PreviousFragment;
-                fragment.PreviousFragment = null;
+                nextFragmentHandle.Ref!._prevFragment!.Dispose();
+                nextFragmentHandle.Ref!._prevFragment = fragment._prevFragment;
+                fragment._prevFragment = null;
             }
 
             // RemoveChunk the fragment
@@ -123,12 +123,12 @@ namespace Solar.Asm.Engine.Model.Code
             _fragmentHandles.RemoveAt(fragId);
 
             // RemoveChunk its reference to the parent section
-            fragHandle.Ref!.Section!.Dispose();
-            fragHandle.Ref!.Section = null;
+            fragHandle.Ref!._section!.Dispose();
+            fragHandle.Ref!._section = null;
 
             // RemoveChunk its reference to the previous fragment if not already transferred to the next
-            fragHandle.Ref!.PreviousFragment?.Dispose();
-            fragHandle.Ref!.PreviousFragment = null;
+            fragHandle.Ref!._prevFragment?.Dispose();
+            fragHandle.Ref!._prevFragment = null;
 
             // Dispose of the section's handle
             fragHandle.Dispose();
@@ -156,7 +156,7 @@ namespace Solar.Asm.Engine.Model.Code
             fragment.GuardValidity();
 
             // Get the handle that corresponds, if it exists
-            var fragHandle = _fragmentHandles.Where(fh => fh.Ref == fragment).SingleOrDefault();
+            var fragHandle = _fragmentHandles.Where(fh => ReferenceEquals(fh.Ref, fragment)).SingleOrDefault();
             if (fragHandle is null)
                 return -1;
 
@@ -181,11 +181,11 @@ namespace Solar.Asm.Engine.Model.Code
                 Fragment fragment = _fragmentHandles[i].Ref!;
 
                 // Check that PreviousFragment is indeed the correct fragment
-                if (fragment.PreviousFragment!.Ref! != _fragmentHandles[i - 1].Ref!)
+                if (fragment.PreviousFragment! != _fragmentHandles[i - 1].Ref!)
                     return false;
 
                 // Check that every fragment points to this section
-                if (fragment.Section!.Ref! != this)
+                if (fragment.Section! != this)
                     return false;
 
             }
@@ -334,6 +334,14 @@ namespace Solar.Asm.Engine.Model.Code
             GuardValidity();
 
             return DesiredAddress;
+        }
+
+        protected override void OnInvalidated()
+        {
+            foreach (var fragHandle in _fragmentHandles)
+                fragHandle.Dispose();
+
+            _fragmentHandles.Clear();
         }
     }
 }
