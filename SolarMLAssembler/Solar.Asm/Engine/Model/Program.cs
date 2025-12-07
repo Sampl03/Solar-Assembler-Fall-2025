@@ -4,6 +4,7 @@ using Solar.EntitySystem.Exceptions;
 
 using Solar.Asm.Engine.Model.Code;
 using Solar.Asm.Engine.Model.Symbols;
+using Solar.Asm.Engine.Model.Exceptions;
 using Solar.Asm.Engine.Model.Expressions;
 using Solar.Asm.Engine.Model.IO;
 
@@ -50,7 +51,18 @@ namespace Solar.Asm.Engine.Model
 
         public abstract Section CreateOrGetSection(QualifiedName name, string configString);
 
-        public abstract Symbol CreateOrGetSymbol(QualifiedName name);
+        public abstract Symbol CreateOrGetSymbol(QualifiedName symbolName, bool fromGlobalNamespace = false);
+
+        /// <summary>
+        /// Finalizes binding for all symbols, ensuring that no local symbols are left undefined.<br/>
+        /// This should always be called by the formatter to ensure correctness
+        /// </summary>
+        /// <exception cref="UnresolvedSymbolException"/>
+        public void FinalizeSymbols()
+        {
+            foreach (Symbol symbol in Symbols.SearchEntities<Symbol>())
+                symbol.FinalizeBind();
+        }
 
         public virtual bool CanMergeInto(IMergeable destination)
         {

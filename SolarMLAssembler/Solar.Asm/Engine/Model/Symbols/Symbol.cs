@@ -9,7 +9,7 @@ namespace Solar.Asm.Engine.Model.Symbols
     /// <summary>
     /// Sealed class that represents a Symbol.
     /// </summary>
-    public sealed class Symbol(QualifiedName name) : ModelEntity(), IUniqueEntity
+    public sealed class Symbol(QualifiedName declNamespace, QualifiedName declName) : ModelEntity(), IUniqueEntity
     {
         /// <summary>
         /// The Program in which this symbol was declared
@@ -23,12 +23,18 @@ namespace Solar.Asm.Engine.Model.Symbols
             }
         }
 
+        /// <summary>
+        /// Unique identifier of the program this symbol was declared within
+        /// </summary>
+        public int OriginProgramID { get; private set; } = 0;
+
         #region Main Properties
 
         /// <summary>
         /// The fully qualified name of this symbol
         /// </summary>
-        public QualifiedName FullyQualifiedName => name;
+        public QualifiedName FullyQualifiedName => declNamespace + declName;
+
 
         /// <summary>
         /// The type of target this symbol points to
@@ -173,6 +179,10 @@ namespace Solar.Asm.Engine.Model.Symbols
         /// <param name="existingSymbol">The existing symbol</param>
         public SymbolMergeBehaviour DetermineMergeBehaviour(Symbol existingSymbol)
         {
+            // If the two symbols come from the same program and have the same name, it's an invalid merge
+            if (OriginProgramID == existingSymbol.OriginProgramID)
+                return SymbolMergeBehaviour.INVALID_MERGE;
+
             bool incomingIsDefined = Target != SymbolTarget.UNDEFINED;
             bool existingIsDefined = existingSymbol.Target != SymbolTarget.UNDEFINED;
             bool incomingIsLocal = BindingType == SymbolBindType.LOCAL;
@@ -182,7 +192,7 @@ namespace Solar.Asm.Engine.Model.Symbols
             if ((!incomingIsDefined && incomingIsLocal) || (!existingIsDefined && existingIsLocal))
                 return SymbolMergeBehaviour.INVALID_MERGE;
 
-            // Rule 2: if either symbol is local, keep both
+            // Rule 2: if either symbol is local, keep both if the origins are different, and error if they aren't
             if (incomingIsLocal || existingIsLocal)
                 return SymbolMergeBehaviour.KEEP_BOTH;
 
@@ -304,6 +314,42 @@ namespace Solar.Asm.Engine.Model.Symbols
         }
 
         #endregion
+
+        /// <summary>
+        /// Finalizes the binding of undefined local symbols, hiking them up namespaces until
+        /// a matching symbol in the same file is found.
+        /// </summary>
+        /// <remarks>
+        /// If a valid definition cannot be found, this throws <see cref="UnresolvedSymbolException"/>
+        /// </remarks>
+        /// <exception cref="UnresolvedSymbolException"/>
+        public void FinalizeBind()
+        {
+            // No rebind needed for defined or extern symbols
+            if (Target != SymbolTarget.UNDEFINED || BindingType != SymbolBindType.LOCAL)
+                return;
+
+            // Try finding a matching symbol a matching symbol
+            Symbol? match = null;
+            if (!declNamespace.IsEmpty) // If already at global scope, there's nothing we can do
+            {
+                match = NamespaceLookupService.ResolveUnique(OwningProgram, declNamespace.Namespace, declName);
+            }
+
+            if (match == null)
+                throw new UnresolvedSymbolException("Could not resolve local symbol", this);
+
+            this.ReplaceWith(match);
+        }
+
+        public override bool Initialise(EntityManager owningTable)
+        {
+            if (!base.Initialise(owningTable))
+                return false;
+
+            OriginProgramID = OwningProgram.GetHashCode();
+            return true;
+        }
 
         protected override void OnInvalidated()
         {
