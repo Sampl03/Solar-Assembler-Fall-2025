@@ -592,7 +592,7 @@ namespace Solar.EntitySystem
         /// </returns>
         /// <exception cref="IrreplaceableEntityException"></exception>
         /// <exception cref="IncompatibleEntityException"></exception>
-        public static bool ReplaceWith<TNew, TOld>(this TNew oldEntity, TOld newEntity)
+        public static bool ReplaceWith<TOld, TNew>(this TOld oldEntity, TNew newEntity)
             where TOld : ModelEntity where TNew : ModelEntity
         {
             oldEntity.GuardValidity();
