@@ -5,7 +5,7 @@
         internal static void CleanupDeadReferences<T>(this IList<WeakReference<T>> weakList) where T : class
         {
             for (int i = weakList.Count - 1; i >= 0; i--)
-                if (!weakList[i].TryGetTarget(out T? target))
+                if (!weakList[i].TryGetTarget(out T? _))
                     weakList.RemoveAt(i);
         }
 

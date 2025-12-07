@@ -63,6 +63,9 @@ namespace Solar.EntitySystem
 
             if (!isInValidState)
             {
+                if (!throwIfInvalid)
+                    return false;
+
                 if (caughtError is not null)
                     throw new InvalidEntityUsedException("This entity threw an exception during state validation", caughtError);
                 else
