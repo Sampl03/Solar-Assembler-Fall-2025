@@ -57,7 +57,7 @@ namespace Solar.Asm.Engine.Model.Expressions
                 ExpressionResult<TReturn> result = expr.Evaluate();
 
                 if (!result.HasValue)
-                    throw new SmlaExpressionHasNoValueException("Constant expression must return a value", expr);
+                    throw new ExpressionHasNoValueException("Constant expression must return a value", expr);
 
                 Items.Add(new ArrayItem<TReturn>(result.Value!));
                 return;
@@ -81,7 +81,7 @@ namespace Solar.Asm.Engine.Model.Expressions
                 ExpressionResult<ImmutableArray<TReturn>> result = subarray.Evaluate();
 
                 if (!result.HasValue)
-                    throw new SmlaExpressionHasNoValueException("Constant sub-array expression must return a value", subarray);
+                    throw new ExpressionHasNoValueException("Constant sub-array expression must return a value", subarray);
 
                 Items.Add(new ArrayItem<TReturn>(result.Value!));
                 return;
@@ -134,7 +134,7 @@ namespace Solar.Asm.Engine.Model.Expressions
                             ExpressionResult<TReturn> evalResult = item.Expression!.Ref!.Evaluate();
 
                             if (!evalResult.HasValue)
-                                throw new SmlaExpressionHasNoValueException("Could not simplify array expression because constant sub-expression has no value.", item.Expression!.Ref!);
+                                throw new ExpressionHasNoValueException("Could not simplify array expression because constant sub-expression has no value.", item.Expression!.Ref!);
 
                             // Replace with constant value
                             item.Cleanup();
@@ -152,7 +152,7 @@ namespace Solar.Asm.Engine.Model.Expressions
                             ExpressionResult<ImmutableArray<TReturn>> subarrayResult = item.SubArray!.Ref!.Evaluate();
 
                             if (!subarrayResult.HasValue)
-                                throw new SmlaExpressionHasNoValueException("Could not simplify array expression because constant subarray-expression has no value.", item.SubArray!.Ref!);
+                                throw new ExpressionHasNoValueException("Could not simplify array expression because constant subarray-expression has no value.", item.SubArray!.Ref!);
 
                             // Replace with constant value
                             item.Cleanup();
@@ -161,7 +161,7 @@ namespace Solar.Asm.Engine.Model.Expressions
 
                         break;
                     default:
-                        throw new SmlaExpressionException("Invalid ArrayExpr item encountered during simplification.", this);
+                        throw new ExpressionException("Invalid ArrayExpr item encountered during simplification.", this);
                 }
             }
 

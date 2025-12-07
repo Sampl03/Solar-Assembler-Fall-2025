@@ -94,7 +94,7 @@ namespace Solar.Asm.Engine.Model.Expressions
 
                     return new() { HasValue = true, Value = subarrayResult.Value! };
                 default:
-                    throw new SmlaExpressionException("Invalid ArrayExpr item encountered during evaluation.", caller);
+                    throw new ExpressionException("Invalid ArrayExpr item encountered during evaluation.", caller);
             }
         }
 

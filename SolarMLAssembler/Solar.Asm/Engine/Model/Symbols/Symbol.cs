@@ -44,7 +44,7 @@ namespace Solar.Asm.Engine.Model.Symbols
             set
             {
                 if (!Enum.IsDefined(typeof(SymbolBindType), value))
-                    throw new SmlaInvalidSymbolException($"Tried assigning invalid symbol binding type: {value} to a symbol", this);
+                    throw new InvalidSymbolException($"Tried assigning invalid symbol binding type: {value} to a symbol", this);
                 _bindingType = value;
             }
         }
@@ -87,7 +87,7 @@ namespace Solar.Asm.Engine.Model.Symbols
         /// <returns>
         /// The value of this symbol. If the symbol is undefined, this returns  <see langword="0L"/>
         /// </returns>
-        /// <exception cref="SmlaInvalidSymbolException"></exception>
+        /// <exception cref="InvalidSymbolException"></exception>
         public ulong GetValue()
         {
             GuardValidity();
@@ -100,14 +100,14 @@ namespace Solar.Asm.Engine.Model.Symbols
                     => AbsoluteValue,
                 SymbolTarget.SECTION
                     => TargetSection?.Ref!.CalculateMemCellVirtualAddress() ??
-                        throw new SmlaInvalidSymbolException("Tried getting value of section symbol with null target section", this),
+                        throw new InvalidSymbolException("Tried getting value of section symbol with null target section", this),
                 SymbolTarget.LABEL
                     => (TargetChunk?.Ref!.CalculateMemCellVirtualAddress() + MemCellOffset) ?? 
-                        throw new SmlaInvalidSymbolException("Tried getting value of label symbol with null target chunk", this),
+                        throw new InvalidSymbolException("Tried getting value of label symbol with null target chunk", this),
                 SymbolTarget.UNDEFINED
                     => 0L, // Undefined symbols default to 0
 
-                _ => throw new SmlaInvalidSymbolException("Tried getting value of symbol with invalid target type", this),
+                _ => throw new InvalidSymbolException("Tried getting value of symbol with invalid target type", this),
             };
         }
 
@@ -135,7 +135,7 @@ namespace Solar.Asm.Engine.Model.Symbols
         public void DefineAsAbsolute(ulong value)
         {
             if (Target != SymbolTarget.UNDEFINED)
-                throw new SmlaInvalidSymbolException("Tried redefining symbol target type", this);
+                throw new InvalidSymbolException("Tried redefining symbol target type", this);
 
             Target = SymbolTarget.ABSOLUTE;
             AbsoluteValue = value;
@@ -144,7 +144,7 @@ namespace Solar.Asm.Engine.Model.Symbols
         public void DefineAsSection(Section section)
         {
             if (Target != SymbolTarget.UNDEFINED)
-                throw new SmlaInvalidSymbolException("Tried redefining symbol target type", this);
+                throw new InvalidSymbolException("Tried redefining symbol target type", this);
 
             Target = SymbolTarget.SECTION;
             TargetSection = section.GetHandle();
@@ -153,7 +153,7 @@ namespace Solar.Asm.Engine.Model.Symbols
         public void DefineAsLabel(Chunk chunk, ulong memCellOffset)
         {
             if (Target != SymbolTarget.UNDEFINED)
-                throw new SmlaInvalidSymbolException("Tried redefining symbol target type", this);
+                throw new InvalidSymbolException("Tried redefining symbol target type", this);
 
             Target = SymbolTarget.LABEL;
             TargetChunk = chunk.GetHandle();
@@ -264,7 +264,7 @@ namespace Solar.Asm.Engine.Model.Symbols
                     destSymbol.OwningProgram.SharedMeta.Outputter.MergeSymbols(this, destSymbol); // CanMergeInto already checked validity
                     return;
                 default:
-                    throw new SmlaInvalidSymbolException("Invalid symbol state during merge", this);
+                    throw new InvalidSymbolException("Invalid symbol state during merge", this);
             }
 
             // Cleanup the handles if they exist
@@ -300,7 +300,7 @@ namespace Solar.Asm.Engine.Model.Symbols
                     return OwningProgram.SharedMeta.Outputter.AreSymbolsEquivalent(this, otherSymbol);
             }
 
-            throw new SmlaInvalidSymbolException("Invalid merge behaviour from symbol", this);
+            throw new InvalidSymbolException("Invalid merge behaviour from symbol", this);
         }
 
         #endregion

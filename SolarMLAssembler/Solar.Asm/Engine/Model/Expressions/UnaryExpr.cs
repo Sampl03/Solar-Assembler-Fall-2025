@@ -69,7 +69,7 @@ namespace Solar.Asm.Engine.Model.Expressions
             ExpressionResult<TOperand> operandResult = OperandExpression.Evaluate();
 
             if (!operandResult.HasValue)
-                throw new SmlaExpressionHasNoValueException("Could not simplify unary expression because constant operand expression has no value.", this);
+                throw new ExpressionHasNoValueException("Could not simplify unary expression because constant operand expression has no value.", this);
 
             // Replace this expression with a literal expression of the result value
             this.ReplaceWith(

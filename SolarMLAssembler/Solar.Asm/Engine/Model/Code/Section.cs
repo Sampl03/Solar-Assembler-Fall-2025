@@ -40,7 +40,7 @@ namespace Solar.Asm.Engine.Model.Code
         /// <param name="i"></param>
         /// <param name="fragment"></param>
         /// <exception cref="IndexOutOfRangeException"></exception>
-        /// <exception cref="SmlaCannotAddException"></exception>
+        /// <exception cref="CannotAddException"></exception>
         public virtual void InsertFragment(int i, Fragment fragment)
         {
             GuardValidity();
@@ -50,10 +50,10 @@ namespace Solar.Asm.Engine.Model.Code
                 throw new IndexOutOfRangeException();
 
             if (fragment.Section is not null)
-                throw new SmlaCannotAddException("Section could not add Fragment which already belongs to another section");
+                throw new CannotAddException("Section could not add Fragment which already belongs to another section");
 
             if (_fragmentHandles.Where(fh => ReferenceEquals(fh.Ref, fragment)).Any()) // Ensure uniqueness
-                throw new SmlaCannotAddException("Section could not add Fragment which already belong to it");
+                throw new CannotAddException("Section could not add Fragment which already belong to it");
 
             // Insert Fragment at the specified location
             if (i == _fragmentHandles.Count)

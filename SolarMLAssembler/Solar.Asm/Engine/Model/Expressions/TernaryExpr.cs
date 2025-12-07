@@ -102,7 +102,7 @@ namespace Solar.Asm.Engine.Model.Expressions
             ExpressionResult<T3> result3 = Expr3.Evaluate();
 
             if (!result1.HasValue || !result2.HasValue || !result3.HasValue)
-                throw new SmlaExpressionHasNoValueException("Could not simplify ternary expression because one or more constant operand has no value.", this);
+                throw new ExpressionHasNoValueException("Could not simplify ternary expression because one or more constant operand has no value.", this);
 
             // Replace this expression with a literal expression of the result value
             this.ReplaceWith(

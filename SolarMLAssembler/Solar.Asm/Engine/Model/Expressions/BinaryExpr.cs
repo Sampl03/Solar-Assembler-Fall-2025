@@ -85,7 +85,7 @@ namespace Solar.Asm.Engine.Model.Expressions
             ExpressionResult<TRight> rightResult = RightExpression.Evaluate();
 
             if (!leftResult.HasValue || !rightResult.HasValue)
-                throw new SmlaExpressionHasNoValueException("Could not simplify binary expression because one or more constant operand has no value.", this);
+                throw new ExpressionHasNoValueException("Could not simplify binary expression because one or more constant operand has no value.", this);
 
             // Replace this expression with a literal expression of the result value
             this.ReplaceWith(

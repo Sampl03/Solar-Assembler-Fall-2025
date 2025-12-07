@@ -38,7 +38,7 @@ namespace Solar.Asm.Engine.Model.Code
         /// <param name="i"></param>
         /// <param name="chunk"></param>
         /// <exception cref="IndexOutOfRangeException"></exception>
-        /// <exception cref="SmlaCannotAddException"></exception>
+        /// <exception cref="CannotAddException"></exception>
         public void InsertChunk(int i, Chunk chunk)
         {
             GuardValidity();
@@ -47,10 +47,10 @@ namespace Solar.Asm.Engine.Model.Code
                 throw new IndexOutOfRangeException();
 
             if (chunk.Fragment is not null)
-                throw new SmlaCannotAddException("Fragment could not add Chunk which already belongs to another section");
+                throw new CannotAddException("Fragment could not add Chunk which already belongs to another section");
 
             if (_chunkHandles.Where(ch => ReferenceEquals(ch.Ref, chunk)).Any()) // Ensure uniqueness
-                throw new SmlaCannotAddException("Fragment could not add Chunk which already belongs to it");
+                throw new CannotAddException("Fragment could not add Chunk which already belongs to it");
 
             // Insert Chunk at the specified location
             if (i == _chunkHandles.Count)

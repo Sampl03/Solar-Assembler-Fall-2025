@@ -40,21 +40,21 @@ namespace Solar.Asm.Engine.Model.Expressions
         /// Calculates the value of this expression within its own context, returning an <see cref="ExpressionResult{TReturn}"/>
         /// </summary>
         /// <remarks>
-        /// If an expression in this tree requires a result but could not get one, this method may throw a <see cref="SmlaExpressionHasNoValueException"/>
+        /// If an expression in this tree requires a result but could not get one, this method may throw a <see cref="ExpressionHasNoValueException"/>
         /// </remarks>
         /// <returns>
         /// An <see cref="ExpressionResult{TReturn}"/> containing the result of the evaluation if there was one
         /// </returns>
-        /// <exception cref="SmlaExpressionHasNoValueException"></exception>
+        /// <exception cref="ExpressionHasNoValueException"></exception>
         public abstract ExpressionResult<TReturn> Evaluate();
 
         /// <summary>
         /// Simplifies this expression as much as possible
         /// </summary>
         /// <remarks>
-        /// If an expression in this tree reported itself as constant but its value could not be determined, this method may throw a <see cref="SmlaExpressionHasNoValueException"/>"/>
+        /// If an expression in this tree reported itself as constant but its value could not be determined, this method may throw a <see cref="ExpressionHasNoValueException"/>"/>
         /// </remarks>
-        /// <exception cref="SmlaExpressionHasNoValueException"></exception>
+        /// <exception cref="ExpressionHasNoValueException"></exception>
         public abstract void Simplify();
     }
 }
