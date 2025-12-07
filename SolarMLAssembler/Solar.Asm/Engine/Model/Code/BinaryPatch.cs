@@ -11,7 +11,7 @@ namespace Solar.Asm.Engine.Model.Code
     {
 
         /// <summary>
-        /// A string ID representative of the patch type. This should be understood by the <see cref="AssemblyParser"/>
+        /// A string ID representative of the patch type. This should be understood by the <see cref="IAssemblyParser"/>
         /// </summary>
         public readonly string PatchTypeID;
 

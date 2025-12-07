@@ -3,7 +3,6 @@ using Solar.EntitySystem.Behavior;
 using Solar.EntitySystem.Exceptions;
 
 using Solar.Asm.Engine.Model.Code;
-using Solar.Asm.Engine.Model.Meta;
 using Solar.Asm.Engine.Model.Symbols;
 using Solar.Asm.Engine.Model.Expressions;
 using Solar.Asm.Engine.Model.IO;
@@ -15,33 +14,43 @@ namespace Solar.Asm.Engine.Model
     /// Contains the <see cref="EntityManager"/> instances to which all Model entities belong.
     /// </summary>
     /// <remarks>
-    /// The specific <see cref="Program"/> instance should be provided by an <see cref="OutputFormatter">
+    /// The specific <see cref="Program"/> instance should be provided by an <see cref="IOutputFormatter"/>
     /// </remarks>
-    public abstract class Program : IContext, IMergeable
+    public abstract class Program : IContext, IMergeable, INamespaceSearchable<Symbol>
     {
         public ArchitectureSpecs ArchSpecs { get => SharedMeta.AssemblyDialect.ArchSpecs; }
 
         public required SharedMetaContext SharedMeta { get; init; }
-        public required InputReader Inputter { get; init; }
 
         public EntityManager CodeEntities { get; init; }
         public EntityManager Symbols { get; init; }
         public EntityManager Expressions { get; init; }
 
-        public Program(in SharedMetaContext sharedMeta, InputReader inputter)
+        /// <summary>
+        /// Creates a <see cref="Program"/> data model connected to the specified shared meta context
+        /// </summary>
+        /// <param name="sharedMeta">The shared meta context across all input readers in a session</param>
+        public Program(in SharedMetaContext sharedMeta)
         {
             SharedMeta      = sharedMeta;
-            Inputter        = inputter;
             CodeEntities    = new(this, typeof(CodeEntity)   );
             Symbols         = new(this, typeof(Symbol)       );
             Expressions     = new(this, typeof(ExpressionBase) );
         }
 
-        public abstract Section CreateOrGetSection();
+        public Symbol? GetUnique(QualifiedName symbolName)
+        {
+            int hash = GetHashCode();
+            return Symbols.SearchEntities<Symbol>(
+                sym => 
+                    (sym.OriginProgramID == hash) &&  // Disallows searches on local symbols from other 
+                    (sym.FullyQualifiedName == symbolName)
+            ).SingleOrDefault();
+        }
 
-        public abstract Symbol CreateOrGetSymbol();
+        public abstract Section CreateOrGetSection(QualifiedName name, string configString);
 
-        public abstract void FinalizeSymbols();
+        public abstract Symbol CreateOrGetSymbol(QualifiedName name);
 
         public virtual bool CanMergeInto(IMergeable destination)
         {

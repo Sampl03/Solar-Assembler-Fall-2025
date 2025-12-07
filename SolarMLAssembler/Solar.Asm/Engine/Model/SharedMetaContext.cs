@@ -9,11 +9,11 @@ namespace Solar.Asm.Engine.Model
     /// </summary>
     public sealed class SharedMetaContext : IContext
     {
-        public readonly OutputFormatter Outputter;
-        public readonly AssemblyParser AssemblyDialect;
+        public readonly IOutputFormatter Outputter;
+        public readonly IAssemblyParser AssemblyDialect;
         private readonly EntityManager Meta;
 
-        public SharedMetaContext(OutputFormatter outputter, AssemblyParser assemblyDialect)
+        public SharedMetaContext(IOutputFormatter outputter, IAssemblyParser assemblyDialect)
         {
             Outputter = outputter;
             AssemblyDialect = assemblyDialect;
