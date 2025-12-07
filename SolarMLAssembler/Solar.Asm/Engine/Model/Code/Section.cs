@@ -44,7 +44,6 @@ namespace Solar.Asm.Engine.Model.Code
         public virtual void InsertFragment(int i, Fragment fragment)
         {
             GuardValidity();
-            RequireRecalculation();
 
             if (i < 0 || i > _fragmentHandles.Count)
                 throw new IndexOutOfRangeException();
@@ -97,7 +96,6 @@ namespace Solar.Asm.Engine.Model.Code
         public virtual bool RemoveFragment(Fragment fragment)
         {
             GuardValidity();
-            RequireRecalculation();
 
             // Ensure the fragment is valid
             fragment.GuardValidity();
@@ -212,8 +210,6 @@ namespace Solar.Asm.Engine.Model.Code
             if (!CanMergeInto(destination))
                 throw new CannotMergeException($"Could not merge Section into entity of type {destination.GetType().FullName}", this, destination);
 
-            RequireRecalculation();
-
             var destSection = (Section)destination;
 
             // To ensure that we don't break arbitrary rules the destination section may have,
@@ -249,49 +245,16 @@ namespace Solar.Asm.Engine.Model.Code
             return Name.GetHashCode();
         }
 
-        private bool _stateChanged = true;
-        public override bool NeedsRecalculation()
-        {
-            // If instance state changed, we need to recalculate
-            if (_stateChanged)
-                return true;
-
-            // Otherwise, we check if any of the fragments changed
-            _stateChanged = _fragmentHandles.Any(fh => fh.Ref!.NeedsRecalculation());
-            return _stateChanged;
-        }
-
-        public override void RequireRecalculation()
-        {
-            GuardValidity();
-
-            _stateChanged = false;
-        }
-
-        protected readonly List<byte> _cachedBytes = [];
         public override IReadOnlyList<byte> EmitBytes()
         {
             GuardValidity();
 
-            // If we don't need a recalculation, just used the cached value
-            if (!NeedsRecalculation())
-                return _cachedBytes;
+            List<byte> result = [];
 
-            // Otherwise, we reset the cache and get the bytes of each chunk
-            _cachedBytes.Clear();
-
-            // For each fragment,
             foreach (Fragment frag in _fragmentHandles.Select(fh => fh.Ref!))
-            {
-                // Fetch its byte representation
-                var nextBytes = frag.EmitBytes();
+                result.AddRange(frag.EmitBytes());
 
-                // Append it to the cache
-                _cachedBytes.AddRange(nextBytes);
-            }
-
-            _cachedBytes.TrimExcess();
-            return _cachedBytes;
+            return result;
         }
 
         public override BinaryPatch[] EmitPatches()

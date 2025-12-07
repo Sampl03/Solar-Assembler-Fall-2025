@@ -82,7 +82,6 @@ namespace Solar.Asm.Engine.Model.Code
 
             // Ensure the chunk is now valid
             chunk.GuardValidity();
-            RequireRecalculation();
         }
 
         /// <summary>
@@ -130,7 +129,6 @@ namespace Solar.Asm.Engine.Model.Code
 
             // Dispose of the fragment's handle
             chunkHandle.Dispose();
-            RequireRecalculation();
 
             return true;
         }
@@ -193,56 +191,16 @@ namespace Solar.Asm.Engine.Model.Code
             return true;
         }
 
-        private bool _stateChanged = true;
-        public override bool NeedsRecalculation()
-        {
-            GuardValidity();
-
-            // If instance state changed, we need to recalculate
-            if (_stateChanged)
-                return true;
-
-            // Otherwise, we check if any of the chunks changed
-            _stateChanged = _chunkHandles.Any(ch => ch.Ref!.NeedsRecalculation());
-            return _stateChanged;
-        }
-
-        public override void RequireRecalculation()
-        {
-            GuardValidity();
-
-            if (!_stateChanged)
-            {
-                Section!.RequireRecalculation(); // Notify the parent if we didn't already do so before
-                _stateChanged = true;
-            }
-
-        }
-
-        private readonly List<byte> _cachedBytes = [];
         public override IReadOnlyList<byte> EmitBytes()
         {
             GuardValidity();
 
-            // If we don't need a recalculation, just used the cached value
-            if (!NeedsRecalculation())
-                return _cachedBytes;
+            List<byte> result = [];
 
-            // Otherwise, we reset the cache and get the bytes of each chunk
-            _cachedBytes.Clear();
-
-            // For each chunk,
             foreach (Chunk chunk in _chunkHandles.Select(ch => ch.Ref!))
-            {
-                // Fetch its byte representation
-                var nextBytes = chunk.EmitBytes();
+                result.AddRange(chunk.EmitBytes());
 
-                // Append it to the cache
-                _cachedBytes.AddRange(nextBytes);
-            }
-
-            _cachedBytes.TrimExcess();
-            return _cachedBytes;
+            return result;
         }
 
         public override BinaryPatch[] EmitPatches()
