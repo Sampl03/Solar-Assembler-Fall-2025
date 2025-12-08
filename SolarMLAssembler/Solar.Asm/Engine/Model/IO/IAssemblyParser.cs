@@ -24,7 +24,7 @@ namespace Solar.Asm.Engine.Model.IO
         /// Should throw <see cref="IncompatibleOperandException"/> if an operand expression is of the wrong type
         /// </remarks>
         /// <param name="context">The <see cref="Program"/> context to create a chunk within within</param>
-        /// <param name="source">The reader positioned at the start of the text to parse</param>
+        /// <param name="source">The source string to translate</param>
         /// <param name="embeddedExpressions">
         /// An array of <see cref="ExpressionBase"/> objects that the source string references
         /// </param>
@@ -33,7 +33,7 @@ namespace Solar.Asm.Engine.Model.IO
         /// </returns>
         /// <exception cref="UnrecognizedChunkException"/>
         /// <exception cref="IncompatibleOperandException"/>
-        public Chunk ParseChunk(Program context, in TrackingReader source, ExpressionBase[] embeddedExpressions);
+        public Chunk ParseChunk(Program context, string source, ExpressionBase[] embeddedExpressions);
 
         /// <summary>
         /// Returns a copy of the inputted byte stream with the patches applied.<br/>
