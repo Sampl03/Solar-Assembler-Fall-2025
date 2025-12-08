@@ -11,7 +11,7 @@ namespace Solar.Asm.Engine.Model.IO
         /// The caller is responsible for verifying the type of expression returned
         /// </remarks>
         /// <param name="context">The <see cref="Program"/> context to add the expression to</param>
-        /// <param name="source">The string of text to translate into an expression tree</param>
-        public ExpressionBase ParseExpression(Program context, string source);
+        /// <param name="source">The reader positioned at the start of the string to parse</param>
+        public ExpressionBase ParseExpression(Program context, in TrackingReader source);
     }
 }
