@@ -15,7 +15,9 @@ namespace Solar.Asm.Engine.Model.IO
         /// Parse a source text string into a dialect-specific <see cref="Chunk"/>.<br/>
         /// It is the responsibility of the caller to parse expressions and provided them through the <paramref name="embeddedExpressions"/><br/>
         /// <br/>
-        /// Embedded expressions are to be represented with the pattern <c>@$EXPR(n)$@</c>,
+        /// Expressions which have a <see cref="string"/> return type are to be embedded within the <paramref name="source"/> string passed to this method<br/>
+        /// <br/>
+        /// Embedded expressions of any other value are to be represented with the pattern <c>@$EXPR(n)$@</c>,
         /// where <c>n</c> is an index into <paramref name="embeddedExpressions"/>.<br/>
         /// Ownership of the expression entities is transfered to the generated <see cref="Chunk"/> as needed.
         /// </summary>
