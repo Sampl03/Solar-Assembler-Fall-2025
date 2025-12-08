@@ -111,7 +111,7 @@ namespace Solar.Asm.Engine.Model.Symbols
                     => (TargetChunk?.Ref!.CalculateMemCellVirtualAddress() + MemCellOffset) ?? 
                         throw new InvalidSymbolException("Tried getting value of label symbol with null target chunk", this),
                 SymbolTarget.UNDEFINED
-                    => 0L, // Undefined symbols default to 0
+                    => OwningProgram.ArchSpecs.AddressMask, // Undefined symbols default to the maximum address
 
                 _ => throw new InvalidSymbolException("Tried getting value of symbol with invalid target type", this),
             };
