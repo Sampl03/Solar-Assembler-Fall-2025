@@ -44,9 +44,10 @@ namespace Solar.Asm.Engine.Model.IO
         /// <remarks>
         /// Should throw <see cref="UnrecognizedPatchException"/> if a <see cref="BinaryPatch"/> with an unrecognized patch ID is found
         /// </remarks>
+        /// <param name="currentVirtualAddress">The virtual address of this data, used for PC-relative mathematics</param>
         /// <param name="data">The data to copy and patch</param>
         /// <param name="patches">The list of patches to apply</param>
         /// <exception cref="UnrecognizedPatchException"/>
-        public byte[] PatchBytes(byte[] data, BinaryPatch[] patches);
+        public byte[] PatchBytes(ulong currentVirtualAddress, byte[] data, BinaryPatch[] patches);
     }
 }

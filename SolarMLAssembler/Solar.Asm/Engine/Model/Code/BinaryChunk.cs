@@ -8,7 +8,7 @@ namespace Solar.Asm.Engine.Model.Code
             GuardValidity();
 
             if (patches.Length > 0)
-                data = OwningProgram.SharedMeta.AssemblyDialect.PatchBytes(data, patches);
+                data = OwningProgram.SharedMeta.AssemblyDialect.PatchBytes(CalculateMemCellVirtualAddress(), data, patches);
 
             return (byte[])data.Clone();
         }
