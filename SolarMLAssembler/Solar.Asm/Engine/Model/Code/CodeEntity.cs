@@ -1,4 +1,5 @@
-﻿using Solar.EntitySystem;
+﻿using Solar.Asm.Engine.Model.Exceptions;
+using Solar.EntitySystem;
 
 namespace Solar.Asm.Engine.Model.Code
 {
@@ -24,9 +25,17 @@ namespace Solar.Asm.Engine.Model.Code
         /// </returns>
         public abstract IReadOnlyList<byte> EmitBytes();
 
+        /// <summary>
+        /// Generates binary patches and verifies that all expressions return acceptable values.
+        /// </summary>
+        /// <remarks>
+        /// This must not be called until the model is done being created.<br/>
+        /// Should throw <see cref="InvalidOperandException"/> if an operand's value is not acceptable
+        /// </remarks>
         /// <returns>
         /// The binary patches emitted by this entity
         /// </returns>
+        /// <exception cref="InvalidOperandException"/>
         public abstract BinaryPatch[] EmitPatches();
 
         /// <returns>

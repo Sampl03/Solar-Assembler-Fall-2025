@@ -13,8 +13,4 @@
     <ProjectReference Include="..\Solar.Asm\Engine\Model\Engine.Model.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Mos6502\" />
-  </ItemGroup>
-
 </Project>
