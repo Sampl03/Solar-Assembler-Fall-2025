@@ -65,6 +65,7 @@ TODO: Show how to hook into the assembler directly (maybe)
 
 ## Credits
 
+- mass:werks ([www.masswerk.at](https://www.masswerk.at/)) for their detailed [6502 Instruction Set reference](https://www.masswerk.at/6502/6502_instruction_set.html)
 - Nick Morgan ([@skilldrick](https://github.com/skilldrick)) and other contributors of the [easy6502 repository](https://github.com/skilldrick/easy6502)
 
 ## Contacts
