@@ -24,15 +24,17 @@ namespace Solar.Asm.Engine.Model.IO
         public Program CreateProgram();
 
         /// <summary>
-        /// Outputs the specified <see cref="Program"/> model to a byte stream
+        /// Outputs the specified <see cref="Program"/> model to a binary stream.<br/>
+        /// Note that the output stream may have partial and invalid data if this method errors.<br/>
+        /// It is the responsibility of the user to appropriately manage this scenario
         /// </summary>
         /// <remarks>
+        /// Implementations of this method should never write more bytes than is physically possible on the target architecture, to prevent potential overflows<br/>
         /// Throws <see cref="CannotOutputException"/> if the <see cref="Program"/> data model cannot be
         /// serialized by this formatter
         /// </remarks>
-        /// <param name="program"></param>
         /// <exception cref="CannotOutputException"/>
-        public Stream EmitProgram(Program program, Stream output);
+        public void EmitProgram(Program program, in Stream output);
 
         /// <summary>
         /// Merges two symbols according to plugin-dependent logic.
