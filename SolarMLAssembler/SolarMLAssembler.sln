@@ -3,17 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.14.36414.22
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CLI", "Solar.Asm\CLI\CLI.csproj", "{BAD44070-EA6D-1611-338E-673AD5A6C49A}"
-	ProjectSection(ProjectDependencies) = postProject
-		{D37D92FC-F705-D489-75DA-0C27146A99CF} = {D37D92FC-F705-D489-75DA-0C27146A99CF}
-	EndProjectSection
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Engine.Model", "Solar.Asm\Engine\Model\Engine.Model.csproj", "{D8522821-A4AF-98F1-7301-620311B68077}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Engine.Orchestrator", "Solar.Asm\Engine\Orchestrator\Engine.Orchestrator.csproj", "{D37D92FC-F705-D489-75DA-0C27146A99CF}"
-	ProjectSection(ProjectDependencies) = postProject
-		{D8522821-A4AF-98F1-7301-620311B68077} = {D8522821-A4AF-98F1-7301-620311B68077}
-	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Solar.EntitySystem", "Solar.EntitySystem\Solar.EntitySystem.csproj", "{C58262F7-EECA-4F6A-BE74-80E58558D05A}"
 EndProject
@@ -29,18 +19,6 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{BAD44070-EA6D-1611-338E-673AD5A6C49A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BAD44070-EA6D-1611-338E-673AD5A6C49A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BAD44070-EA6D-1611-338E-673AD5A6C49A}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{BAD44070-EA6D-1611-338E-673AD5A6C49A}.Debug|x64.Build.0 = Debug|Any CPU
-		{BAD44070-EA6D-1611-338E-673AD5A6C49A}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{BAD44070-EA6D-1611-338E-673AD5A6C49A}.Debug|x86.Build.0 = Debug|Any CPU
-		{BAD44070-EA6D-1611-338E-673AD5A6C49A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BAD44070-EA6D-1611-338E-673AD5A6C49A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{BAD44070-EA6D-1611-338E-673AD5A6C49A}.Release|x64.ActiveCfg = Release|Any CPU
-		{BAD44070-EA6D-1611-338E-673AD5A6C49A}.Release|x64.Build.0 = Release|Any CPU
-		{BAD44070-EA6D-1611-338E-673AD5A6C49A}.Release|x86.ActiveCfg = Release|Any CPU
-		{BAD44070-EA6D-1611-338E-673AD5A6C49A}.Release|x86.Build.0 = Release|Any CPU
 		{D8522821-A4AF-98F1-7301-620311B68077}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D8522821-A4AF-98F1-7301-620311B68077}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D8522821-A4AF-98F1-7301-620311B68077}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -53,18 +31,6 @@ Global
 		{D8522821-A4AF-98F1-7301-620311B68077}.Release|x64.Build.0 = Release|Any CPU
 		{D8522821-A4AF-98F1-7301-620311B68077}.Release|x86.ActiveCfg = Release|Any CPU
 		{D8522821-A4AF-98F1-7301-620311B68077}.Release|x86.Build.0 = Release|Any CPU
-		{D37D92FC-F705-D489-75DA-0C27146A99CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D37D92FC-F705-D489-75DA-0C27146A99CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D37D92FC-F705-D489-75DA-0C27146A99CF}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{D37D92FC-F705-D489-75DA-0C27146A99CF}.Debug|x64.Build.0 = Debug|Any CPU
-		{D37D92FC-F705-D489-75DA-0C27146A99CF}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{D37D92FC-F705-D489-75DA-0C27146A99CF}.Debug|x86.Build.0 = Debug|Any CPU
-		{D37D92FC-F705-D489-75DA-0C27146A99CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D37D92FC-F705-D489-75DA-0C27146A99CF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D37D92FC-F705-D489-75DA-0C27146A99CF}.Release|x64.ActiveCfg = Release|Any CPU
-		{D37D92FC-F705-D489-75DA-0C27146A99CF}.Release|x64.Build.0 = Release|Any CPU
-		{D37D92FC-F705-D489-75DA-0C27146A99CF}.Release|x86.ActiveCfg = Release|Any CPU
-		{D37D92FC-F705-D489-75DA-0C27146A99CF}.Release|x86.Build.0 = Release|Any CPU
 		{C58262F7-EECA-4F6A-BE74-80E58558D05A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C58262F7-EECA-4F6A-BE74-80E58558D05A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C58262F7-EECA-4F6A-BE74-80E58558D05A}.Debug|x64.ActiveCfg = Debug|Any CPU
