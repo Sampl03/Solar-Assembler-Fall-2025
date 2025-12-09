@@ -36,6 +36,12 @@ namespace Solar.Asm.Engine.Model.Code
         /// </summary>
         public ulong DesiredAddress { get; set; } = 0;
 
+        /// <summary>
+        /// Determines whether <see cref="DesiredAddress"/> is a fixed value or not<br/>
+        /// If <see langword="true"/>, formatters must ensure this address, and such sections with incompatible addresses must be discarded.
+        /// </summary>
+        public bool IsDesiredAddressFixed { get; set; } = false;
+
         public SectionFlags Flags { get; init; } = flags;
         
         /// <summary>
@@ -212,6 +218,18 @@ namespace Solar.Asm.Engine.Model.Code
             if (Name != destSection.Name)
                 return false;
 
+            switch(IsDesiredAddressFixed, destSection.IsDesiredAddressFixed)
+            {
+                case (true, true): // If both are fixed, their addresses must agree
+                    if (DesiredAddress != destSection.DesiredAddress)
+                        return false;
+                    break;
+                case (true, false): // incoming can't be fixed otherwise since merging would change its address
+                    return false;
+                default: // Otherwise we can merge the incoming section
+                    break;
+            }
+
             return Flags.CanMergeInto(destSection.Flags);
         }
 
@@ -246,6 +264,9 @@ namespace Solar.Asm.Engine.Model.Code
                 return false;
 
             var otherSection = (Section)other;
+
+            if (Name != otherSection.Name)
+                return false;
 
             return Flags.CanMergeInto(otherSection.Flags);
         }
