@@ -16,10 +16,20 @@ namespace Solar.Asm.Engine.Model.Code
     /// <param name="flags">The section's flags</param>
     public class Section(string name, SectionFlags flags) : CodeEntity(), IUniqueEntity
     {
+        private static uint _nextDeclaration = 0;
+
         private readonly List<EntityHandle<Fragment>> _fragmentHandles = [];
         public IEnumerable<Fragment> Fragments => _fragmentHandles.Select(fh => fh.Ref!);
 
         public string Name { get; init; } = name;
+
+        /// <summary>
+        /// The declaration order of this section.
+        /// </summary>
+        /// <remarks>
+        /// This is automatically set to an increasing counter and should not be overriden
+        /// </remarks>
+        public uint DeclarationOrder { get; } = _nextDeclaration++;
 
         /// <summary>
         /// The desired address of this section, in the units of the target architecture

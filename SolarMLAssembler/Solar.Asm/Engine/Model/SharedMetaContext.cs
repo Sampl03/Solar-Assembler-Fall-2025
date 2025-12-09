@@ -7,7 +7,7 @@ namespace Solar.Asm.Engine.Model
     /// <summary>
     /// Top-level context for shared meta-enties across multiple programs in a single session
     /// </summary>
-    public sealed class SharedMetaContext : IContext
+    public readonly record struct SharedMetaContext : IContext
     {
         public readonly IOutputFormatter Outputter;
         public readonly IAssemblyParser AssemblyDialect;

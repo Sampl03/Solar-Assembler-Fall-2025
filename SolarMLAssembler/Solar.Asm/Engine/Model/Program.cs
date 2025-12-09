@@ -21,7 +21,7 @@ namespace Solar.Asm.Engine.Model
     {
         public ArchitectureSpecs ArchSpecs { get => SharedMeta.AssemblyDialect.ArchSpecs; }
 
-        public required SharedMetaContext SharedMeta { get; init; }
+        public SharedMetaContext SharedMeta { get; init; }
 
         public EntityManager CodeEntities { get; init; }
         public EntityManager Symbols { get; init; }
@@ -30,8 +30,8 @@ namespace Solar.Asm.Engine.Model
         /// <summary>
         /// Creates a <see cref="Program"/> data model connected to the specified shared meta context
         /// </summary>
-        /// <param name="sharedMeta">The shared meta context across all input readers in a session</param>
-        public Program(in SharedMetaContext sharedMeta)
+        /// <param name="sharedMeta">A container for meta context shared across all input readers</param>
+        public Program(SharedMetaContext sharedMeta)
         {
             SharedMeta      = sharedMeta;
             CodeEntities    = new(this, typeof(CodeEntity)   );
@@ -49,9 +49,52 @@ namespace Solar.Asm.Engine.Model
             ).SingleOrDefault();
         }
 
-        public abstract Section CreateOrGetSection(QualifiedName name, string configString);
+        /// <summary>
+        /// Fetches a section by name, or creates one with the given configuration string if a section does not already exist<br/>
+        /// If the specified section already exists, <paramref name="configString"/>'s value should not matter
+        /// </summary>
+        /// <remarks>
+        /// Note that if two or more sections share a name, this method should return the one first declared.
+        /// </remarks>
+        /// <param name="name"></param>
+        /// <param name="configString"></param>
+        /// <returns>
+        /// The existing or newly created section
+        /// </returns>
+        public abstract Section CreateOrGetSection(string name, string configString);
 
-        public abstract Symbol CreateOrGetSymbol(QualifiedName symbolName, bool fromGlobalNamespace = false);
+        /// <summary>
+        /// Fetches a symbol by qualified name in the specified namespace, or creates an undefined local symbol if it doesn't find one
+        /// </summary>
+        /// <remarks>
+        /// If <paramref name="namespace"/> is <see cref="null"/>, the symbol is searched within the global namespace
+        /// </remarks>
+        /// <param name="symbolName"></param>
+        /// <param name="namespace"></param>
+        /// <returns>
+        /// The existing or newly created symbol
+        /// </returns>
+        public virtual Symbol CreateOrGetSymbol(QualifiedName symbolName, QualifiedName? @namespace = null)
+        {
+            // If no namespace is specified, get the global namespace
+            @namespace ??= new QualifiedName([]);
+
+            // Search up the namespace structure for this symbol
+            var existingSymbol = NamespaceLookupService.ResolveUnique(
+                this,
+                @namespace,
+                symbolName
+            );
+
+            if (existingSymbol is not null)
+                return existingSymbol;
+
+            // If it doesn't exist, create one
+            Symbol newSymbol = new Symbol(@namespace, symbolName);
+            newSymbol.Initialise(Symbols);
+
+            return newSymbol;
+        }
 
         /// <summary>
         /// Finalizes binding for all symbols, ensuring that no local symbols are left undefined.<br/>
