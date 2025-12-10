@@ -36,26 +36,26 @@ namespace Demo.Mos6502
             _operandHandle = operandValue?.GetHandle();
         }
 
-        internal static Mos6502Chunk CreateImplied(byte opcode)
+        public static Mos6502Chunk CreateImplied(byte opcode)
         {
             return new Mos6502Chunk(Mos6502ChunkLayout.Implied, shortOpcode: opcode);
         }
 
-        internal static Mos6502Chunk CreateImmediate(byte opcode, Expression<ulong> operand)
+        public static Mos6502Chunk CreateImmediate(byte opcode, Expression<ulong> operand)
         {
             return new Mos6502Chunk(Mos6502ChunkLayout.Immediate, shortOpcode: opcode, operandValue: operand);
         }
 
-        internal static Mos6502Chunk CreateMixed(byte shortOpcode, byte longOpcode, Expression<ulong> operand)
+        public static Mos6502Chunk CreateMixed(byte shortOpcode, byte longOpcode, Expression<ulong> operand)
         {
             return new Mos6502Chunk(Mos6502ChunkLayout.Mixed, shortOpcode: shortOpcode, longOpcode: longOpcode, operandValue: operand);
         }
-        internal static Mos6502Chunk CreateAddress(byte opcode, Expression<ulong> operand)
+        public static Mos6502Chunk CreateAddress(byte opcode, Expression<ulong> operand)
         {
             return new Mos6502Chunk(Mos6502ChunkLayout.Address, longOpcode: opcode, operandValue: operand);
         }
 
-        internal static Mos6502Chunk CreateRelative(byte opcode, Expression<ulong> operand)
+        public static Mos6502Chunk CreateRelative(byte opcode, Expression<ulong> operand)
         {
             return new Mos6502Chunk(Mos6502ChunkLayout.Relative, shortOpcode: opcode, operandValue: operand);
         }
