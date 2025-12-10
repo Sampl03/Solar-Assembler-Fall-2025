@@ -1,4 +1,5 @@
-﻿using Solar.Asm.Engine.Model.Code;
+﻿using Solar.Asm.Engine.Model;
+using Solar.Asm.Engine.Model.Code;
 using Solar.Asm.Engine.Model.Exceptions;
 using Solar.Asm.Engine.Model.Expressions;
 using Solar.EntitySystem;
@@ -66,7 +67,13 @@ namespace Demo.Mos6502
 
             // Pre-calculate the operand if we have one
             Operand?.Simplify();
-            var operandValueResult = Operand?.Evaluate();
+            ExpressionResult<ulong>? operandValueResult = null;
+
+            // To avoid potential infinite recursion, we only evaluate if the operand is constant, and patch later
+            if (Operand?.IsConstantExpression ?? false)
+                operandValueResult = Operand?.Evaluate();
+            else
+                operandValueResult = new ExpressionResult<ulong> { HasValue = true, Value = OwningProgram.ArchSpecs.AddressMask };
 
             if (operandValueResult != null && !operandValueResult.HasValue)
                 throw new ExpressionHasNoValueException("Mos6502Chunk operand has no value", Operand!);

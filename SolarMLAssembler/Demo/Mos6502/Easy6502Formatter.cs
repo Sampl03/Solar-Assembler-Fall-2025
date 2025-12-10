@@ -130,7 +130,8 @@ namespace Demo.Mos6502
 
                 // Output the section
                 byte[] sectionBytes = section.EmitBytes().ToArray();
-                section.EmitPatches(); // Verify that all conditions are met, even if we don't care about the patches
+                BinaryPatch[] patches = section.EmitPatches(); // Verify that all conditions are met, even if we don't care about the patches
+                sectionBytes = _assemblyParser.PatchBytes(currentAddress, sectionBytes, patches);
 
                 ulong sectionLength = (ulong)sectionBytes.Length;
 

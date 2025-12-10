@@ -53,7 +53,7 @@ namespace Demo.Mos6502
                         patched_data[patch.CellOffset + 1] = (byte)(patchValueResult.Value >> 8);
                         break;
                     case PatchCodes.Relative:
-                        long offset = (long)(patchValueResult.Value - (currentVirtualAddress + 2));
+                        long offset = (long)(patchValueResult.Value - (currentVirtualAddress + patch.CellOffset + 1));
                         if (offset != (sbyte)offset) // If the offset doesn't fit in an 8-bit offset, error
                             throw new InvalidOperandException($"Mos6502 relative mode expected an 8-bit signed offset, got value {offset}");
                         patched_data[patch.CellOffset] = (byte)offset;
