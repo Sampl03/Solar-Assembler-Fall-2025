@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Solar.EntitySystem", "Solar
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Demo6502", "Demo\Demo6502.csproj", "{F3AB59CA-CC29-78FA-68E4-F885817926C8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DemoCLI", "DemoCLI\DemoCLI.csproj", "{6DEF7667-6167-461B-9CA7-83B5BF6DEC1C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -55,6 +57,18 @@ Global
 		{F3AB59CA-CC29-78FA-68E4-F885817926C8}.Release|x64.Build.0 = Release|Any CPU
 		{F3AB59CA-CC29-78FA-68E4-F885817926C8}.Release|x86.ActiveCfg = Release|Any CPU
 		{F3AB59CA-CC29-78FA-68E4-F885817926C8}.Release|x86.Build.0 = Release|Any CPU
+		{6DEF7667-6167-461B-9CA7-83B5BF6DEC1C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6DEF7667-6167-461B-9CA7-83B5BF6DEC1C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6DEF7667-6167-461B-9CA7-83B5BF6DEC1C}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{6DEF7667-6167-461B-9CA7-83B5BF6DEC1C}.Debug|x64.Build.0 = Debug|Any CPU
+		{6DEF7667-6167-461B-9CA7-83B5BF6DEC1C}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{6DEF7667-6167-461B-9CA7-83B5BF6DEC1C}.Debug|x86.Build.0 = Debug|Any CPU
+		{6DEF7667-6167-461B-9CA7-83B5BF6DEC1C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6DEF7667-6167-461B-9CA7-83B5BF6DEC1C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6DEF7667-6167-461B-9CA7-83B5BF6DEC1C}.Release|x64.ActiveCfg = Release|Any CPU
+		{6DEF7667-6167-461B-9CA7-83B5BF6DEC1C}.Release|x64.Build.0 = Release|Any CPU
+		{6DEF7667-6167-461B-9CA7-83B5BF6DEC1C}.Release|x86.ActiveCfg = Release|Any CPU
+		{6DEF7667-6167-461B-9CA7-83B5BF6DEC1C}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
