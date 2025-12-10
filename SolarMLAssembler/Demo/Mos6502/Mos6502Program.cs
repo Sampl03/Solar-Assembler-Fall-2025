@@ -1,5 +1,6 @@
 ﻿using Solar.Asm.Engine.Model;
 using Solar.Asm.Engine.Model.Code;
+using Solar.Asm.Engine.Model.Symbols;
 
 namespace Demo.Mos6502
 {
@@ -31,6 +32,11 @@ namespace Demo.Mos6502
                 }
             );
             newSection.Initialise(CodeEntities);
+
+            // Create a symbol referencing this
+            Symbol newSectionSymbol = new(new([]), name);
+            newSectionSymbol.Initialise(Symbols);
+            newSectionSymbol.DefineAsSection(newSection);
 
             return newSection;
         }
