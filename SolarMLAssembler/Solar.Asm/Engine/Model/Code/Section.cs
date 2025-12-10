@@ -45,6 +45,23 @@ namespace Solar.Asm.Engine.Model.Code
         public SectionFlags Flags { get; init; } = flags;
         
         /// <summary>
+        /// Creates a new fragment appended to the end of this section
+        /// </summary>
+        /// <returns>
+        /// The new fragment
+        /// </returns>
+        public virtual Fragment CreateFragment()
+        {
+            GuardValidity();
+
+            Fragment fragment = new();
+            fragment.Initialise(OwningProgram.CodeEntities);
+            AddFragment(fragment);
+
+            return fragment;
+        }
+
+        /// <summary>
         /// Adds the fragment to the end of this section
         /// </summary>
         /// <param name="fragment"></param>

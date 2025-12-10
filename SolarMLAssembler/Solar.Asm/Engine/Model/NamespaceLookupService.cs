@@ -32,11 +32,14 @@ namespace Solar.Asm.Engine.Model
             where T : ModelEntity
         {
             T? result = null;
-            while (currentNamespace.IsEmpty)
+            while (true)
             {
                 result = searchable.GetUnique(currentNamespace + nameToSearch);
 
                 if (result != null)
+                    break;
+
+                if (currentNamespace.IsEmpty)
                     break;
 
                 currentNamespace = currentNamespace.Namespace;
