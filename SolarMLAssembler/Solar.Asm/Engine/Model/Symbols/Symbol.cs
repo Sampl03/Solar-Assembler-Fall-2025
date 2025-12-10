@@ -337,7 +337,7 @@ namespace Solar.Asm.Engine.Model.Symbols
             }
 
             if (match == null)
-                throw new UnresolvedSymbolException("Could not resolve local symbol", this);
+                throw new UnresolvedSymbolException($"Could not resolve local symbol '{FullyQualifiedName}'", this);
 
             this.ReplaceWith(match);
         }
