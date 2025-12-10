@@ -53,11 +53,11 @@ namespace Solar.Asm.Engine.Model.Code
                 throw new CannotAddException("Fragment could not add Chunk which already belongs to it");
 
             // Insert Chunk at the specified location
+            chunk._fragment = this.GetHandle();
             if (i == _chunkHandles.Count)
                 _chunkHandles.Add(chunk.GetHandle());
             else
                 _chunkHandles.Insert(i, chunk.GetHandle());
-            chunk._fragment = this.GetHandle();
 
             /* Update the links */
             EntityHandle<Chunk>?

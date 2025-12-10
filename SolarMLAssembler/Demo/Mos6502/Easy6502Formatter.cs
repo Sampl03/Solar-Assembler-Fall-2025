@@ -117,16 +117,13 @@ namespace Demo.Mos6502
             string prevSection = $"START 0000-{CODE_START:X4}";
             foreach (var section in sections)
             {
-                // Calculate the pad amount, or -1 if there's overlap with the previous section
-                int padAmount = (int)Math.Clamp(-1L, (long)section.DesiredAddress - (long)currentAddress, MAX_PADDING_ARRAY_SIZE);
-
-                if (padAmount < 0)
+                if (currentAddress > section.DesiredAddress)
                     throw new CannotOutputException($"Section '{prevSection}' overlaps with Section '{section.Name}', conflict could not be resolved");
 
                 // Pad between sections
                 while (currentAddress < section.DesiredAddress)
                 {
-                    int gap = Math.Min(MAX_PADDING_ARRAY_SIZE, (int)(section.DesiredAddress - currentAddress));
+                    int gap = Math.Min(padding.Length, (int)(section.DesiredAddress - currentAddress));
                     bw.Write(padding, 0, gap);
                     currentAddress += (ulong)gap;
                 }

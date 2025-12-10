@@ -88,11 +88,11 @@ namespace Solar.Asm.Engine.Model.Code
                 throw new CannotAddException("Section could not add Fragment which already belong to it");
 
             // Insert Fragment at the specified location
+            fragment._section = this.GetHandle();
             if (i == _fragmentHandles.Count)
                 _fragmentHandles.Add(fragment.GetHandle());
             else
                 _fragmentHandles.Insert(i, fragment.GetHandle());
-            fragment._section = this.GetHandle();
 
             /* Update the links */
             EntityHandle<Fragment>?
