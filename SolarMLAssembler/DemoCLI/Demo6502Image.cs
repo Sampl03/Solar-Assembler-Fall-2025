@@ -84,6 +84,7 @@ namespace Demo
             Symbol symSecImages = program.CreateOrGetSymbol("images"); // Should have been defined when `images` section was created
             Symbol lbl_nextImage = program.CreateOrGetSymbol("nextImage");
             Symbol lbl_prevImage = program.CreateOrGetSymbol("prevImage");
+            Symbol lbl_drawImageJump = program.CreateOrGetSymbol("drawImageJump");
             Symbol lbl_stopImage = program.CreateOrGetSymbol("stopImage");
             Symbol lbl_drawImage = program.CreateOrGetSymbol("drawImage");
             Symbol lbl_offset = program.CreateOrGetSymbol("offset");
@@ -143,14 +144,14 @@ namespace Demo
             Fragment codeFragment = codeSection.CreateFragment();
 
             //   jsr init
-            //   jmp drawImage
+            //   jsr drawImage
             //   jsr loop
             //   jsr clearScreen
             // quit:
             //   brk
             {
                 Mos6502Chunk.CreateAddress(JSR_ABS, SymbolRefExpr.From(program, lbl_init)).RegisterToFragment(codeFragment);
-                Mos6502Chunk.CreateAddress(JMP_ABS, SymbolRefExpr.From(program, lbl_drawImage)).RegisterToFragment(codeFragment);
+                Mos6502Chunk.CreateAddress(JSR_ABS, SymbolRefExpr.From(program, lbl_drawImage)).RegisterToFragment(codeFragment);
                 Mos6502Chunk.CreateAddress(JSR_ABS, SymbolRefExpr.From(program, lbl_loop)).RegisterToFragment(codeFragment);
                 Mos6502Chunk.CreateAddress(JSR_ABS, SymbolRefExpr.From(program, lbl_clearScreen)).RegisterToFragment(codeFragment);
 
@@ -218,15 +219,18 @@ namespace Demo
             // nextImage:
             //   iny
             //   cpy #NUM_IMAGES    ; Wrap around to zero if greater than or equal to NUM_IMAGES
-            //   bmi drawImage
+            //   bmi drawImageJump
             //   ldy #0
-            //   jmp drawImage
+            //   beq drawImageJump  ; Unconditional branch
             //
             // prevImage:
             //   dey
-            //   bpl drawImage      ; Wrap around to NUM_IMAGES if less than 0
+            //   bpl drawImageJump       ; Wrap around to NUM_IMAGES if less than 0
             //   ldy <$ #NUM_IMAGES-1 $>
-            //   jmp drawImage
+            //  
+            // drawImageJump:
+            //   jsr drawImage
+            //   jmp loop
             //
             // stopImage:
             //   rts                ; Exit to clearScreen
@@ -235,9 +239,10 @@ namespace Demo
                     Mos6502Chunk.CreateImplied(INY_IMPL).RegisterToFragment(codeFragment),
                     0);
                 Mos6502Chunk.CreateImmediate(CPY_IMM, SymbolRefExpr.From(program, symAbsNUMIMAGES)).RegisterToFragment(codeFragment);
-                Mos6502Chunk.CreateRelative(BMI_REL, SymbolRefExpr.From(program, lbl_drawImage)).RegisterToFragment(codeFragment);
+                Mos6502Chunk.CreateRelative(BMI_REL, SymbolRefExpr.From(program, lbl_drawImageJump)).RegisterToFragment(codeFragment);
                 Mos6502Chunk.CreateImmediate(LDY_IMM, LiteralExpr<ulong>.FromValue(program, 0)).RegisterToFragment(codeFragment);
-                Mos6502Chunk.CreateAddress(JMP_ABS, SymbolRefExpr.From(program, lbl_drawImage)).RegisterToFragment(codeFragment);
+                Mos6502Chunk.CreateRelative(BEQ_REL, SymbolRefExpr.From(program, lbl_drawImageJump)).RegisterToFragment(codeFragment);
+                Mos6502Chunk.CreateAddress(JSR_ABS, SymbolRefExpr.From(program, lbl_drawImage)).RegisterToFragment(codeFragment);
 
                 lbl_prevImage.DefineAsLabel(
                     Mos6502Chunk.CreateImplied(DEY_IMPL).RegisterToFragment(codeFragment),
@@ -250,7 +255,11 @@ namespace Demo
                     SymbolMath.Sub
                 );
                 Mos6502Chunk.CreateImmediate(LDY_IMM, numimgm1_expr).RegisterToFragment(codeFragment);
-                Mos6502Chunk.CreateAddress(JMP_ABS, SymbolRefExpr.From(program, lbl_drawImage)).RegisterToFragment(codeFragment);
+
+                lbl_drawImageJump.DefineAsLabel(
+                    Mos6502Chunk.CreateAddress(JSR_ABS, SymbolRefExpr.From(program, lbl_drawImage)).RegisterToFragment(codeFragment),
+                    0);
+                Mos6502Chunk.CreateAddress(JMP_ABS, SymbolRefExpr.From(program, lbl_loop)).RegisterToFragment(codeFragment);
 
                 lbl_stopImage.DefineAsLabel(
                     Mos6502Chunk.CreateImplied(RTS_IMPL).RegisterToFragment(codeFragment),
@@ -374,16 +383,16 @@ namespace Demo
             }
 
             // clearScreen:
-            //   lda #2             ; Reset screen address to 0200
-            //   sta SCREEN_ADDRESS 
-            //   lda #0             ; Just iterate over screen space, writing 0
+            //   lda #2                     ; Reset screen address to 0200
+            //   sta <$ SCREEN_ADDRESS+1 $>
+            //   lda #0                     ; Just iterate over screen space, writing 0
             //   ldx #4
             //   ldy #0
             // clear_loop:
             //   sta (SCREEN_ADDRESS),Y
             //   iny
             //   bne clear_loop
-            //   inc SCREEN_ADDRESS
+            //   inc <$ SCREEN_ADDRESS+1 $>
             //   dex
             //   bne clear_loop
             //   rts
@@ -392,7 +401,15 @@ namespace Demo
                 lbl_clearScreen.DefineAsLabel(
                     Mos6502Chunk.CreateImmediate(LDA_IMM, LiteralExpr<ulong>.FromValue(program, 2)).RegisterToFragment(codeFragment),
                     0);
-                Mos6502Chunk.CreateImmediate(STA_ZPG, SymbolRefExpr.From(program, symVarSCREENADDR)).RegisterToFragment(codeFragment);
+
+                var screenaddr_upper = BinaryExpr<ulong, ulong, ulong>.From(
+                    program,
+                    SymbolRefExpr.From(program, symVarSCREENADDR),
+                    LiteralExpr<ulong>.FromValue(program, 1),
+                    SymbolMath.Add
+                );
+                Mos6502Chunk.CreateImmediate(STA_ZPG, screenaddr_upper).RegisterToFragment(codeFragment);
+
                 Mos6502Chunk.CreateImmediate(LDA_IMM, LiteralExpr<ulong>.FromValue(program, 0)).RegisterToFragment(codeFragment);
                 Mos6502Chunk.CreateImmediate(LDX_IMM, LiteralExpr<ulong>.FromValue(program, 4)).RegisterToFragment(codeFragment);
                 Mos6502Chunk.CreateImmediate(LDY_IMM, LiteralExpr<ulong>.FromValue(program, 0)).RegisterToFragment(codeFragment);
@@ -402,7 +419,7 @@ namespace Demo
                     0);
                 Mos6502Chunk.CreateImplied(INY_IMPL).RegisterToFragment(codeFragment);
                 Mos6502Chunk.CreateRelative(BNE_REL, SymbolRefExpr.From(program, lbl_clear_loop)).RegisterToFragment(codeFragment);
-                Mos6502Chunk.CreateImmediate(INC_ZPG, SymbolRefExpr.From(program, symVarSCREENADDR)).RegisterToFragment(codeFragment);
+                Mos6502Chunk.CreateImmediate(INC_ZPG, screenaddr_upper).RegisterToFragment(codeFragment);
                 Mos6502Chunk.CreateImplied(DEX_IMPL).RegisterToFragment(codeFragment);
                 Mos6502Chunk.CreateRelative(BNE_REL, SymbolRefExpr.From(program, lbl_clear_loop)).RegisterToFragment(codeFragment);
                 Mos6502Chunk.CreateImplied(RTS_IMPL).RegisterToFragment(codeFragment);
