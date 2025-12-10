@@ -1,22 +1,31 @@
 ﻿
 namespace Solar.Asm.Engine.Model.Code
 {
-    public sealed class BinaryChunk(byte[] data, BinaryPatch[] patches) : Chunk
+    public sealed class BinaryChunk : Chunk
     {
+        private byte[] _data;
+        private BinaryPatch[] _patches;
+
+        public BinaryChunk(byte[] data, BinaryPatch[] patches)
+        {
+            _data = (byte[])data.Clone();
+            _patches = (BinaryPatch[])patches.Clone();
+        }
+
         public override IReadOnlyList<byte> EmitBytes()
         {
             GuardValidity();
 
-            if (patches.Length > 0)
-                data = OwningProgram.SharedMeta.AssemblyDialect.PatchBytes(CalculateMemCellVirtualAddress(), data, patches);
+            if (_patches.Length > 0)
+                _data = OwningProgram.SharedMeta.AssemblyDialect.PatchBytes(CalculateMemCellVirtualAddress(), _data, _patches);
 
-            return (byte[])data.Clone();
+            return (byte[])_data.Clone();
         }
 
         public override BinaryPatch[] EmitPatches() {
             GuardValidity();
 
-            return (BinaryPatch[])patches.Clone();
+            return (BinaryPatch[])_patches.Clone();
         }
     }
 }
