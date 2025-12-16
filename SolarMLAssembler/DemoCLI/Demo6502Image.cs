@@ -242,7 +242,6 @@ namespace Demo
                 Mos6502Chunk.CreateRelative(BMI_REL, SymbolRefExpr.From(program, lbl_drawImageJump)).RegisterToFragment(codeFragment);
                 Mos6502Chunk.CreateImmediate(LDY_IMM, LiteralExpr<ulong>.FromValue(program, 0)).RegisterToFragment(codeFragment);
                 Mos6502Chunk.CreateRelative(BEQ_REL, SymbolRefExpr.From(program, lbl_drawImageJump)).RegisterToFragment(codeFragment);
-                Mos6502Chunk.CreateAddress(JSR_ABS, SymbolRefExpr.From(program, lbl_drawImage)).RegisterToFragment(codeFragment);
 
                 lbl_prevImage.DefineAsLabel(
                     Mos6502Chunk.CreateImplied(DEY_IMPL).RegisterToFragment(codeFragment),
@@ -302,7 +301,8 @@ namespace Demo
 
             //   cpy #0                 ; Address of image is 0x400*Y + (IMAGE_ADDRESS), so we count down, adding 4 to A
             //   beq end_offset
-            // offset: 
+            // offset:
+            //   clc
             //   adc #4
             //   dey
             //   bne offset
