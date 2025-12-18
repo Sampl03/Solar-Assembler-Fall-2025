@@ -5,7 +5,7 @@
 *This repository was created for the University of Ottawa CSI 4900 class of Fall 2025*\
 *It contains a subset of features suitable to the 4 months of the Honours Project, and may be expanded upon at a later date, in a separate repository*
 
-**NOTE:** This README provides a high-level overview. For full technical detail, see the [project wiki](https://github.com/Sampl03/Solar-Assembler-Fall-2025/wiki)
+**NOTE:** This README provides a high-level overview. For full technical detail, see the [project wiki](../../wiki)
 
 ---
 
@@ -15,7 +15,8 @@ It takes inspiration from the *Intermediate Representation* (IR) code of contemp
 
 By doing so, the time cost of creating new tooling while working on custom architectures is severely reduced, and the expressivity of a more complex system is kept between multiple different projects.
 
-Fundamentally, an *SMLA* session reads input from a source file into the data model, manipulates the data model, and returns the model to be encoded into an output format. Sessions can create new sessions, allowing for the merging of several source files, provided that the formats are all compatible.
+Fundamentally, an *SMLA* session reads input from one or more source files into a data model, manipulates the data model, and returns the model to be encoded into an output format.
+Sessions can contain multiple program contexts, allowing for the merging of several source files, provided that the formats are all compatible.
 
 There is built-in support for **Expressions** which can be reevaluated as needed, and many components of the model can be extended to add new behaviour.
 
@@ -28,11 +29,13 @@ Due to time constraints and the inherent extensibility of the assembler, this re
 
 #### Demo
 
-In order to demo the assembler, a small 6502 implementation of the QOI image format will be written, assembled, and then run on the [Easy 6502 Simulator](https://skilldrick.github.io/easy6502/simulator.html)
+As a proof of viability, a small 6502 program will be written and assembled by this framework, and then run on the [Easy 6502 Simulator](https://skilldrick.github.io/easy6502/simulator.html)
 
-See [QOI Demo](https://github.com/Sampl03/Solar-Assembler-Fall-2025/wiki/QOI-Demo)
+See the [6502 demo](../../wiki/QOI-Demo) wiki page
 
 ## Project Structure
+
+This repository contains a Visual Studio Solution with 4 projects:
 
 This repository contains a Visual Studio Solution with 5 projects:
 
@@ -40,9 +43,14 @@ This repository contains a Visual Studio Solution with 5 projects:
 |---|---|
 | [Solar.EntitySystem](/SolarMLAssembler/Solar.EntitySystem)             | The overarching entity system |
 | [Engine.Model](/SolarMLAssembler/Solar.Asm/Engine/Model)               | The library which defines the base data model classes |
-| [Engine.Orchestrator](/SolarMLAssembler/Solar.Asm/Engine/Orchestrator) | The library which can be called to assemble a source file |
-| [CLI](/SolarMLAssembler/Solar.Asm/CLI)                                 | The default command-line utility which wraps around the Orchestrator |
 | [Demo6502](/SolarMLAssembler/Demo)                                     | The plugin implementation for 6502 assembly |
+| [DemoCLI](/SolarMLAssembler/Demo)                                      | The plugin implementation for 6502 assembly |
+
+As well as two utility programs written in Python:
+| Project | Description |
+|---|---|
+
+TODO: Continue
 
 ## Installation
 
