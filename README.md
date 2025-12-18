@@ -25,19 +25,18 @@ The name **Multilingual** reflects its ability to work with multiple different a
 
 ### The Goals of This Project
 
-Due to time constraints and the inherent extensibility of the assembler, this repository will focus on implementing the core data structure, the plugin system, a command-line tool, and a small demo plugin and program pair.
+Due to time constraints and the inherent extensibility of the assembler, this repository focuses on implementing the core data structure and framework entities, the entity system, and a small demo written in 6502 assembly.
 
 #### Demo
 
-As a proof of viability, a small 6502 program will be written and assembled by this framework, and then run on the [Easy 6502 Simulator](https://skilldrick.github.io/easy6502/simulator.html)
+As a proof of viability, a small 6502 program was be written and assembled by this framework, which runs on the [Easy 6502 Simulator](https://skilldrick.github.io/easy6502/simulator.html)
 
-See the [6502 demo](../../wiki/QOI-Demo) wiki page
+See the [6502 demo](../../wikia/demo) wiki page
+
 
 ## Project Structure
 
 This repository contains a Visual Studio Solution with 4 projects:
-
-This repository contains a Visual Studio Solution with 5 projects:
 
 | Project | Description |
 |---|---|
@@ -54,27 +53,47 @@ TODO: Continue
 
 ## Installation
 
-This project is built on C# 12.
+#### Framework
+The core framework is written with C# 12 and is a Visual Studio solution
 
-From source, simply build the `CLI` project. It will generate the following files:\
-TODO: Explain what each DLL is
+There are no additional packages to install.
 
-As well as the following folders:\
-TODO: Explain Plugins and SystemPlugins
+#### Python Utilities
+The utilities `ImagePrep` and `BinToDCB` were written using Python 3.12.1
 
-In order to run the Demo, build the `Demo6502` project, and add the generated `Demo6502.plugin.dll` file to the "Plugins" folders.
+`BinToDCB` requires no additional module.
 
-Other plugins can be added by adding their DLLs to the `Plugins` or `SystemPlugins` folders
+`ImagePrep` requires [`numpy`](https://pypi.org/project/numpy/) and [`PIL`](https://pypi.org/project/pillow/)
 
 ## Usage
-TBD\
-TODO: Show how to use the command-line for basic assembly\
-TODO: Show how to hook into the assembler directly (maybe)
+This repository contains the core model, the 6502 plugin, a demo, and two Python utilities.
+
+The core model and 6502 plugin are library projects and cannot be run standalone.
+
+#### Demo
+*Main page:* [6502 Demo Program](../../wikia/demo)
+
+To run the demo builder, please compile the `DemoCLI` project and run `DemoCLI.exe`. The assembled program will be written to `out/demo6502_image.o`.\
+New images can be added to the `Images/` folder, although they must be 32x32 pixel binary dumps compatible with the `Easy6502` screen format.
+
+The assembled demo can be run on the [Easy6502 Simulator](https://skilldrick.github.io/easy6502/simulator.html), but must be converted to a chain of byte
+declarations using `BinToDCB`
+
+#### BinToDCB
+*Main page:* [6502 Demo - Utilities](../../wikia/demo-utils#BinToDCB)
+
+In order to be executed by the `Easy6502` emulator, the binary object file must be converted to `Declare Byte (DCB)` syntax.\
+Please drag `demo6502_image.o` to a folder containing the [bintodcb.py](/BinToDCB/bintodcb.py) script and execute.\
+The new file, `demo6502_image.s`, will be loadable in the `Easy6502` and can simply be copy pasted.
+
+#### ImagePrep
+For `ImagePrep`, please read [6502 Demo - Utilities](../../wiki/demo-utils#ImagePrep)
 
 ## Credits
 
 - mass:werks ([www.masswerk.at](https://www.masswerk.at/)) for their detailed [6502 Instruction Set reference](https://www.masswerk.at/6502/6502_instruction_set.html)
 - Nick Morgan ([@skilldrick](https://github.com/skilldrick)) and other contributors of the [easy6502 repository](https://github.com/skilldrick/easy6502)
+- [Demo Image Credits](/ImagePrep/image_credits.md)
 
 ## Contacts
 
