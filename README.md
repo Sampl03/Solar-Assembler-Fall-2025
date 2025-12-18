@@ -40,16 +40,17 @@ This repository contains a Visual Studio Solution with 4 projects:
 
 | Project | Description |
 |---|---|
-| [Solar.EntitySystem](/SolarMLAssembler/Solar.EntitySystem)             | The overarching entity system |
-| [Engine.Model](/SolarMLAssembler/Solar.Asm/Engine/Model)               | The library which defines the base data model classes |
-| [Demo6502](/SolarMLAssembler/Demo)                                     | The plugin implementation for 6502 assembly |
-| [DemoCLI](/SolarMLAssembler/Demo)                                      | The plugin implementation for 6502 assembly |
+| [Solar.EntitySystem](/SolarMLAssembler/Solar.EntitySystem) | The overarching entity system |
+| [Engine.Model](/SolarMLAssembler/Solar.Asm/Engine/Model)   | The library which defines the base data model classes |
+| [Demo6502](/SolarMLAssembler/Demo)                         | The plugin implementation for 6502 assembly |
+| [DemoCLI](/SolarMLAssembler/DemoCLI)                          | The executable command-line tool which creates and assembles the demo program via the other libraries |
 
 As well as two utility programs written in Python:
 | Project | Description |
 |---|---|
+| [BinToDCB](/BinToDCB/bintodcb.py) | Converts binary files to DCB (declare bytes) statements for the `Easy6502` simulator |
+| [ImagePrep](/ImagePrep/) | Creates 32x32px binary image dumps out of compatible images |
 
-TODO: Continue
 
 ## Installation
 
@@ -64,6 +65,7 @@ The utilities `ImagePrep` and `BinToDCB` were written using Python 3.12.1
 `BinToDCB` requires no additional module.
 
 `ImagePrep` requires [`numpy`](https://pypi.org/project/numpy/) and [`PIL`](https://pypi.org/project/pillow/)
+
 
 ## Usage
 This repository contains the core model, the 6502 plugin, a demo, and two Python utilities.
