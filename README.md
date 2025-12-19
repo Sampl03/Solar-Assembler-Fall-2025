@@ -31,7 +31,7 @@ Due to time constraints and the inherent extensibility of the assembler, this re
 
 As a proof of viability, a small 6502 program was be written and assembled by this framework, which runs on the [Easy 6502 Simulator](https://skilldrick.github.io/easy6502/simulator.html)
 
-See the [6502 demo](../../wikia/demo) wiki page
+See the [6502 demo](../../wiki/demo) wiki page
 
 
 ## Project Structure
@@ -73,7 +73,7 @@ This repository contains the core model, the 6502 plugin, a demo, and two Python
 The core model and 6502 plugin are library projects and cannot be run standalone.
 
 #### Demo
-*Main page:* [6502 Demo Program](../../wikia/demo)
+*Main page:* [6502 Demo Program](../../wiki/demo)
 
 To run the demo builder, please compile the `DemoCLI` project and run `DemoCLI.exe`. The assembled program will be written to `out/demo6502_image.o`.\
 New images can be added to the `Images/` folder, although they must be 32x32 pixel binary dumps compatible with the `Easy6502` screen format.
@@ -82,14 +82,14 @@ The assembled demo can be run on the [Easy6502 Simulator](https://skilldrick.git
 declarations using `BinToDCB`
 
 #### BinToDCB
-*Main page:* [6502 Demo - Utilities](../../wikia/demo-utils#BinToDCB)
+*Main page:* [6502 Demo - Utilities](../../wiki/demo-utils#bintodcb)
 
 In order to be executed by the `Easy6502` emulator, the binary object file must be converted to `Declare Byte (DCB)` syntax.\
 Please drag `demo6502_image.o` to a folder containing the [bintodcb.py](/BinToDCB/bintodcb.py) script and execute.\
 The new file, `demo6502_image.s`, will be loadable in the `Easy6502` and can simply be copy pasted.
 
 #### ImagePrep
-For `ImagePrep`, please read [6502 Demo - Utilities](../../wiki/demo-utils#ImagePrep)
+For `ImagePrep`, please read [6502 Demo - Utilities](../../wiki/demo-utils#imageprep)
 
 ## Credits
 
