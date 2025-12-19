@@ -567,7 +567,7 @@ namespace Solar.EntitySystem
         /// <param name="newEntity"></param>
         /// <returns></returns>
         /// <exception cref="InvalidEntityUsedException"></exception>
-        public static bool CanReplaceWith<TNew, TOld>(this TOld oldEntity, TNew newEntity)
+        public static bool CanReplaceWith<TOld, TNew>(this TOld oldEntity, TNew newEntity)
             where TOld : ModelEntity where TNew : ModelEntity
         {
             oldEntity.GuardValidity();
