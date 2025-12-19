@@ -82,14 +82,14 @@ The assembled demo can be run on the [Easy6502 Simulator](https://skilldrick.git
 declarations using `BinToDCB`
 
 #### BinToDCB
-*Main page:* [6502 Demo - Utilities](../../wiki/demo-utils#bintodcb)
+*Main page:* [6502 Demo - Utilities](../../wiki/demo‐utils#bintodcb)
 
 In order to be executed by the `Easy6502` emulator, the binary object file must be converted to `Declare Byte (DCB)` syntax.\
 Please drag `demo6502_image.o` to a folder containing the [bintodcb.py](/BinToDCB/bintodcb.py) script and execute.\
 The new file, `demo6502_image.s`, will be loadable in the `Easy6502` and can simply be copy pasted.
 
 #### ImagePrep
-For `ImagePrep`, please read [6502 Demo - Utilities](../../wiki/demo-utils#imageprep)
+For `ImagePrep`, please read [6502 Demo - Utilities](../../wiki/demo‐utils#imageprep)
 
 ## Credits
 
